@@ -1,9 +1,19 @@
-<template>
-  <div class="hello"></div>
+<template lang = "pug">
+  .hello
+    button.login(v-on:click ="login") Login
 </template>
 
 <script>
-export default { name: 'HelloWorld' };
+import { auth } from '../firebase/firebase.api';
+
+export default {
+  name: 'HelloWorld',
+  methods: {
+    async login() {
+      await auth.signIn();
+    },
+  },
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

@@ -11,7 +11,7 @@ const resource = {
 
 // login, logout, state change
 const auth = (() => {
-  const provider = resource.auth.GoogleAuthProvider();
+  const provider = new firebase.auth.GoogleAuthProvider();
   const authEvent = {};
 
   resource.auth.onAuthStateChanged((user) => {
