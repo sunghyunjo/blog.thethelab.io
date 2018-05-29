@@ -17,6 +17,7 @@
     "cors": "^2.8.4",
     "firebase": "^5.0.4",
     "lodash": "^4.17.10",
+    "marked": "^0.4.0",
     "v-markdown-editor": "^1.0.7",
     "vue": "^2.5.16",
     "vue-router": "^3.0.1",
