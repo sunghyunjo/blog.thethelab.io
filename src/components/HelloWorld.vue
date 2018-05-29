@@ -1,6 +1,7 @@
 <template lang = "pug">
   .hello
     button.login(v-on:click ="login") Login
+    button.login(v-on:click ="logout") Logout
 </template>
 
 <script>
@@ -10,7 +11,12 @@ export default {
   name: 'HelloWorld',
   methods: {
     async login() {
+      await auth.addStateChangeListener('login', auth.signIn);
       await auth.signIn();
+    },
+    async logout() {
+      await auth.addStateChangeListener('logout', auth.signOut);
+      await auth.signOut();
     },
   },
 };

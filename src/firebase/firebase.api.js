@@ -15,12 +15,16 @@ const auth = (() => {
   const authEvent = {};
 
   resource.auth.onAuthStateChanged((user) => {
-    _.forEach(authEvent, func => func(user));
+    _.forEach(authEvent, (func) => {
+      func(user);
+      console.log('stateChange');
+      console.log(func);
+    });
   });
 
   async function signIn() {
     const result = await resource.auth.signInWithPopup(provider);
-    console.log(result);
+    console.log('result:', result);
   }
 
   async function signOut() {
