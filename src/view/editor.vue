@@ -1,64 +1,46 @@
 <template lang="pug">
   .editorWrapper
     .titleSection
-      .title_bg
+      .title_bg(v-bind:style="{background: bgColor}")
         .title_txtWrapper
           .bg_colorPicker
-            .color(v-on:click="changeBgColor")
-            .color(v-on:click="changeBgColor")
-            .color(v-on:click="changeBgColor")
-            .color(v-on:click="changeBgColor")
-            .color(v-on:click="changeBgColor")
+            template(v-for="color in colors")
+              .color(v-bind:style="{ background : color.bg }",
+              v-on:click="changeBgColor(color)"
+              v-bind:class="{selectColor : color.selected}")
           .title_txt
             input.title(placeholder="제목을 입력하세요", autofocus='true')
             input.subTitle(placeholder="소제목을 입력하세요")
-            .tags#tags
+            .tags
+              template(v-for="tag in tags")
+                .tag(v-if="tag.selected"
+                v-bind:style="{color: txtColor}") {{ '#' + tag.name }}
     .contentSection
       .top
         .tagSelectorSection
           .buttonWrapper
             .mdl-button.mdl-js-button(v-on:click="onTag",
-            v-bind:style="[isTagMode ? selectedStyle : nonSelectedStyle]") 태그선택
+            v-bind:class="{ selected : isTagMode }") 태그선택
         .buttonSection
           .buttonWrapper
-            .mdl-button.mdl-js-button(v-on:click="editMode"
-            v-bind:style="[isEditMode ? selectedStyle : nonSelectedStyle]") 작성모드
-          .buttonWrapper
-            .mdl-button.mdl-js-button(v-on:click="previewMode"
-            v-bind:style="[!isEditMode ? selectedStyle : nonSelectedStyle]") 미리보기
-      .tagSelection(v-bind:style="[isTagMode ? visible : nonVisible ]")
-        .tagBtn.mdl-button.mdl-js-button(v-on:click="addTag") Java
-        .tagBtn.mdl-button.mdl-js-button(v-on:click="addTag") javaScript
-        .tagBtn.mdl-button.mdl-js-button(v-on:click="addTag") HTML
-        .tagBtn.mdl-button.mdl-js-button(v-on:click="addTag") CSS
-        .tagBtn.mdl-button.mdl-js-button(v-on:click="addTag") C
-        .tagBtn.mdl-button.mdl-js-button(v-on:click="addTag") C++
-        .tagBtn.mdl-button.mdl-js-button(v-on:click="addTag") JSON
-        .tagBtn.mdl-button.mdl-js-button(v-on:click="addTag") Android
-        .tagBtn.mdl-button.mdl-js-button(v-on:click="addTag") iOS
-        .tagBtn.mdl-button.mdl-js-button(v-on:click="addTag") Unity
-        .tagBtn.mdl-button.mdl-js-button(v-on:click="addTag") NodeJS
-        .tagBtn.mdl-button.mdl-js-button(v-on:click="addTag") Network
-        .tagBtn.mdl-button.mdl-js-button(v-on:click="addTag") OS
-        .tagBtn.mdl-button.mdl-js-button(v-on:click="addTag") jQuery
-        .tagBtn.mdl-button.mdl-js-button(v-on:click="addTag") firebase
-        .tagBtn.mdl-button.mdl-js-button(v-on:click="addTag") Vue
-        .tagBtn.mdl-button.mdl-js-button(v-on:click="addTag") Kotlin
-        .tagBtn.mdl-button.mdl-js-button(v-on:click="addTag") Data-Structure
-        .tagBtn.mdl-button.mdl-js-button(v-on:click="addTag") Web
-        .tagBtn.mdl-button.mdl-js-button(v-on:click="addTag") Algorithm
+            .mdl-button.mdl-js-button(v-on:click="changeMode") {{ nextMode }}
+      .tagSelection(v-bind:class="{ nonVisible : !isTagMode }")
+        .tag
+          template(v-for="tag in tags")
+            .tagBtn.mdl-button.mdl-js-button(v-on:click="changeTagSelectMode(tag)",
+            v-bind:class="{ selected : tag.selected}") {{ tag.name }}
       textarea.editor(v-model="inputMarked",
                       placeholder="md규칙으로 작성된 내용을 입력해주세요.",
-                      v-bind:style="[isEditMode ? visible : nonVisible]")
+                      v-bind:class="{ nonVisible : !isWriteMode }")
       .editor_parsed(v-html="parse",
-                    v-bind:style="[isEditMode ? nonVisible : visible]")
+                    v-bind:class="{ nonVisible : isWriteMode }")
 </template>
 
 <script>
+/* eslint-disable no-param-reassign */
+
 import marked from 'marked';
 import gnb from '../components/gnb';
-
-// TODO:: 버튼 컴포넌트로 분리하기.
 
 export default {
   name: 'editor',
@@ -72,48 +54,65 @@ export default {
   },
   data() {
     return {
-      isEditMode: true,
+      tags: [
+        { name: 'Java', selected: false },
+        { name: 'iOS', selected: false },
+        { name: 'Android', selected: false },
+        { name: 'javascript', selected: false },
+        { name: 'HTML', selected: false },
+        { name: 'CSS', selected: false },
+        { name: 'C', selected: false },
+        { name: 'C++', selected: false },
+        { name: 'Unity', selected: false },
+        { name: 'NodeJS', selected: false },
+        { name: 'Network', selected: false },
+        { name: 'OS', selected: false },
+        { name: 'Data Structure', selected: false },
+        { name: 'jQuery', selected: false },
+        { name: 'Firebase', selected: false },
+        { name: 'Kotlin', selected: false },
+        { name: 'Algorithm', selected: false },
+      ],
+      isWriteMode: true, // 작성하기모드
       inputMarked: '',
       isTagMode: false,
-      visible: {
-        display: 'block',
-      },
-      nonVisible: {
-        display: 'none',
-      },
-      selectedStyle: {
-        background: '#dadada',
-      },
-      nonSelectedStyle: {
-        background: 'white',
-      },
+      nextMode: '미리보기',
+      colors: [
+        { bg: '#e7b62f', text: '#7C4108', selected: false },
+        { bg: '#ff908e', text: '#a2e5ff', selected: false },
+        { bg: '#215dbe', text: '#e5901f', selected: false },
+        { bg: '#009738', text: '#ff9388', selected: false },
+        { bg: '#863c97', text: '#ffffff', selected: false },
+      ],
+      bgColor: '#a8a8a8',
+      txtColor: '#ffffff',
     };
   },
   methods: {
-    editMode() {
-      if (!this.isEditMode) {
-        this.isEditMode = true;
-        return this.isEditMode;
+    changeMode() {
+      this.isWriteMode = !this.isWriteMode;
+      if (this.isWriteMode) {
+        this.nextMode = '미리보기';
+      } else {
+        this.nextMode = '작성하기';
       }
-      return this.isEditMode;
-    },
-    previewMode() {
-      if (this.isEditMode) {
-        this.isEditMode = false;
-        return !this.isEditMode;
-      }
-      return this.isEditMode;
     },
     onTag() {
       this.isTagMode = !this.isTagMode;
       return this.isTagMode;
     },
-    // TODO :: 태그 선택되면, 선택 표시하고 다시 클릭하면 지우기 기능 추가.
-    addTag(e) {
-      document.getElementById('tags').innerText += (` #${e.target.innerText}`);
+    changeTagSelectMode(tag) {
+      tag.selected = !tag.selected;
     },
-    changeBgColor() {
-      return 0;
+    changeBgColor(color) {
+      _.forEach(this.colors, (c) => {
+        if (c.selected) {
+          c.selected = false;
+        }
+      });
+      color.selected = !color.selected;
+      this.bgColor = color.bg;
+      this.txtColor = color.text;
     },
   },
 };
@@ -140,7 +139,7 @@ input
     .title_bg
       width: 100%
       height: inherit
-      background: #ff908e
+      transition: background .3s
       .title_txtWrapper
         width: 700px
         height: auto
@@ -148,7 +147,7 @@ input
         .bg_colorPicker
           position: absolute
           top: 50px
-          left: 50%
+          left: 45%
           .color
             cursor: pointer
             margin: 0px 6px
@@ -189,7 +188,9 @@ input
             font-family: 'Roboto Mono', monospace
             font-size: 15px
             text-align: left
-            color: #a2e5ff
+            .tag
+              display: inline-block
+              padding: 0 5px
 
   .contentSection
     width: 700px
@@ -226,11 +227,12 @@ input
             border-radius: 20px
     .tagSelection
       width: auto
-      height: 120px
+      height: auto
       .tagBtn
         border-radius: 20px
         font-family: 'Roboto Mono', monospace
         text-transform: none
+        margin: 3px
     .editor, .editor_parsed
       border-top: 1px dotted #d0d0d0
       padding-top: 20px
@@ -238,5 +240,13 @@ input
       height: 500px
       font-size: 15px
       text-align: left
+      font-family: 'NanumSquare', sans-serif
 
+  .selected
+    background: #e6e6e6
+  .nonVisible
+    display: none
+  .selectColor
+    border: 1px solid white
+    transform: scale(1.5)
 </style>

@@ -146,7 +146,9 @@ export default {
         .writeBtn
           padding: 20px
       .postingList
-        overflow: auto
+        overflow-y: auto
+        overflow-x: hidden
+        height: calc(100vh - 250px)
         white-space: nowrap
         .title
           font-size: 15px
