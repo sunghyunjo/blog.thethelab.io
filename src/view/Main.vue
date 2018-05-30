@@ -52,12 +52,14 @@ export default {
   height: 100vh
   background: url("../assets/bg3.jpg") no-repeat center
   background-size: cover
+  @media #{$phone}
+    height: 100%
   .main_gradient
     position: absolute
     top: 0
     left: 0
     width: 100%
-    height: 100%
+    height: 100vh
     background: radial-gradient(rgba(0, 0, 0, 0.09), rgba(0, 0, 0, 0.59))
     transition: background .3s
     &.searched
