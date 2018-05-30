@@ -25,7 +25,7 @@
           .buttonWrapper
             .mdl-button.mdl-js-button(v-on:click="changeMode") {{ nextMode }}
       .tagSelection(v-bind:class="{ nonVisible : !isTagMode }")
-        .tag
+        .tagWrapper
           template(v-for="tag in tags")
             .tagBtn.mdl-button.mdl-js-button(v-on:click="changeTagSelectMode(tag)",
             v-bind:class="{ selected : tag.selected}") {{ tag.name }}
@@ -161,6 +161,7 @@ input
             &:hover
               transform: scale(2)
         .title_txt
+          width: inherit
           position: absolute
           bottom: 20px
           background: transparent
@@ -183,7 +184,7 @@ input
               color: white
               opacity: .7
           .tags
-            width: 100%
+            width: inherit
             height: 50px
             font-family: 'Roboto Mono', monospace
             font-size: 15px
