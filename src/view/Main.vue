@@ -1,6 +1,6 @@
 <template lang = "pug">
   .mainWrapper
-    .main_gradient
+    .main_gradient(v-bind:class="{searched : isSearchMode}")
     .main(v-bind:class="{searched : isSearchMode}")
       .main_mention "{{grade}}" {{userName}}님 </br> {{mention}}
       .searchWrapper
@@ -45,10 +45,12 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+@import "../global"
+
 .mainWrapper
   width: 100%
   height: 100vh
-  background: url("../assets/bg3.jpg") no-repeat
+  background: url("../assets/bg3.jpg") no-repeat center
   background-size: cover
   .main_gradient
     position: absolute
@@ -57,6 +59,9 @@ export default {
     width: 100%
     height: 100%
     background: radial-gradient(rgba(0, 0, 0, 0.09), rgba(0, 0, 0, 0.59))
+    transition: background .3s
+    &.searched
+      background: white
   .main
     width: 700px
     height: 100vh
@@ -64,14 +69,15 @@ export default {
     position: relative
     text-shadow: 0 0 15px #000000
     font-family: 'NanumSquare', sans-serif
+    @media #{$phone}
+      width: 100%
     &.searched
       .main_mention
         opacity: 0
-        top: -200px
       .searchWrapper
-        top: -20vh
+        top: 0
+        opacity: 0
       .commentWrapper
-        bottom: -10vh
         opacity: 0
     .main_mention
       transition: opacity .3s, top .3s
@@ -85,6 +91,10 @@ export default {
       color: white
       opacity: .9
       font-family: 'East Sea Dokdo', cursive
+      @media #{$phone}
+        width: 100%
+        font-size: 50px
+        line-height: 1.2
     .searchWrapper
       transition: opacity .5s, top .5s
       position: relative
@@ -92,6 +102,9 @@ export default {
       height: auto
       margin: auto
       width: 350px
+      @media #{$phone}
+        width: 60vw
+        left: -10px
       input.search
         font-size: 20px
         height: 30px
@@ -110,6 +123,9 @@ export default {
           outline: none
         &::-webkit-search-cancel-button
           transform: scale(.7)
+        @media #{$phone}
+          width: 100%
+          font-size: 14px
       .searchBtn
         width: 40px
         height: 30px
@@ -127,6 +143,8 @@ export default {
       bottom: 50px
       color: white
       font-size: 12px
+      @media #{$phone}
+        font-size: 10px
 .mdl-button
   border: .5px solid #bebebe
   border-radius: 20px
