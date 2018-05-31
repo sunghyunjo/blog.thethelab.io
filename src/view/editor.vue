@@ -78,6 +78,7 @@ export default {
       isTagMode: false,
       nextMode: '미리보기',
       colors: [
+        { bg: '#a8a8a8', text: '#ffffff', selected: true },
         { bg: '#e7b62f', text: '#7C4108', selected: false },
         { bg: '#ff908e', text: '#a2e5ff', selected: false },
         { bg: '#215dbe', text: '#e5901f', selected: false },
