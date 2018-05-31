@@ -2,7 +2,8 @@
   .mainWrapper
     .main_gradient(v-bind:class="{searched : isSearchMode}")
     .main(v-bind:class="{searched : isSearchMode}")
-      .main_mention "{{grade}}" {{userName}}님 </br> {{mention}}
+      .main_mention(v-bind:class="{searched : isSearchMode}").
+        "{{grade}}" {{userName}}님 </br> {{mention}}
       .searchWrapper
         input.search(type='search', autofocus='true', placeholder="관심있는 키워드를 입력하세요.")
         i.material-icons.searchBtn(v-on:click="search") search
@@ -11,13 +12,18 @@
         </br> 이곳에 <strong>{{postNum}}</strong>개의 지식을 공유했습니다.
       <!--.mdl-button.mdl-js-button.login(v-on:click ="login") Login-->
       <!--.mdl-button.mdl-js-button.login(v-on:click ="logout") Logout-->
+      post-list.postList(v-bind:class="{searched : isSearchMode}")
 </template>
 
 <script>
 import { auth } from '../firebase/firebase.api';
+import list from '../components/list';
 
 export default {
   name: 'Main',
+  components: {
+    'post-list': list,
+  },
   data() {
     return {
       grade: '코딩바보',
@@ -93,6 +99,8 @@ export default {
       color: white
       opacity: .9
       font-family: 'East Sea Dokdo', cursive
+      &.searched
+        display: none
       @media #{$phone}
         width: 100%
         font-size: 50px
@@ -147,6 +155,10 @@ export default {
       font-size: 12px
       @media #{$phone}
         font-size: 10px
+.postList
+  display: none
+  &.searched
+    display: block
 .mdl-button
   border: .5px solid #bebebe
   border-radius: 20px
