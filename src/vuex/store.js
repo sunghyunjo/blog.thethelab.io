@@ -5,7 +5,7 @@ import Vue from 'vue';
 Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
-    count: 0,
+    user: {},
   },
   /** 반드시 동기여야 한다.
    * method 이름이 문자열 이므로 상수로 빼둘 필요가 있다.
@@ -15,6 +15,9 @@ const store = new Vuex.Store({
     increment(state, data) {
       state.count += data.inc;
     },
+    setUser(state, data) {
+      state.user = data;
+    },
   },
 
   /** 비동기가 포함 될 수 있다
@@ -22,12 +25,10 @@ const store = new Vuex.Store({
    * call by : sotre.dispatch('method', arg)
    */
   actions: {
-    increment(context, data) {
-      context.commit('increment', data);
-    },
   },
   getters: {
     getCount: state => state.count,
+    getUser: state => state.user,
   },
 });
 

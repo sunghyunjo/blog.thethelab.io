@@ -10,8 +10,8 @@
       .commentWrapper
         .comment {{userName}}님은 THETHELAB과 함께 <strong>{{time}}</strong>시간을 보냈습니다.
         </br> 이곳에 <strong>{{postNum}}</strong>개의 지식을 공유했습니다.
-      <!--.mdl-button.mdl-js-button.login(v-on:click ="login") Login-->
-      <!--.mdl-button.mdl-js-button.login(v-on:click ="logout") Logout-->
+      .mdl-button.mdl-js-button.login(v-on:click ="login") Login
+      .mdl-button.mdl-js-button.login(v-on:click ="logout") Logout
       post-list.postList(v-bind:class="{searched : isSearchMode}")
 </template>
 
@@ -36,16 +36,19 @@ export default {
   },
   methods: {
     async login() {
-      await auth.addStateChangeListener('login', auth.signIn);
       await auth.signIn();
     },
     async logout() {
-      await auth.addStateChangeListener('logout', auth.signOut);
       await auth.signOut();
     },
     search() {
       this.isSearchMode = true;
     },
+  },
+  mounted() {
+    auth.addStateChangeListener('login', (user) => {
+      console.log('alloc', user);
+    });
   },
 };
 </script>

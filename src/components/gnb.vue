@@ -11,8 +11,8 @@
         .user_imgWrapper
           .user_img
         .user
-          .user_name 조성현
-          .user_grade 관리자
+          .user_name {{getUserData.displayName}}
+          .user_grade {{getUserData.grade}}
         .writeBtn
           .mdl-button.mdl-js-button.mdl-button--primary 글쓰기
       .postingList
@@ -55,6 +55,11 @@ export default {
         width: '0',
       },
     };
+  },
+  computed: {
+    getUserData() {
+      return this.$store.state.user;
+    },
   },
   methods: {
     onSideMenu() {
