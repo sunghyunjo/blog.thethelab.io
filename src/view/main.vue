@@ -5,18 +5,17 @@
       .main_mention(v-bind:class="{searched : isSearchMode}").
         "{{grade}}" {{userName}}님 </br> {{mention}}
       .searchWrapper
-        input.search(type='search', autofocus='true', placeholder="관심있는 키워드를 입력하세요.")
+        input.search(type='search', autofocus='true',
+        placeholder="관심있는 키워드를 입력하세요.", v-model="keyword")
         i.material-icons.searchBtn(v-on:click="search") search
       .commentWrapper
         .comment {{userName}}님은 THETHELAB과 함께 <strong>{{time}}</strong>시간을 보냈습니다.
         </br> 이곳에 <strong>{{postNum}}</strong>개의 지식을 공유했습니다.
-      .mdl-button.mdl-js-button.login(v-on:click ="login") Login
-      .mdl-button.mdl-js-button.login(v-on:click ="logout") Logout
+      .mdl-button.mdl-js-button.login(v-on:click ="search") 전체보기
       post-list.postList(v-bind:class="{searched : isSearchMode}")
 </template>
 
 <script>
-import { auth } from '../firebase/firebase.api';
 import list from '../components/list';
 
 export default {
@@ -32,24 +31,18 @@ export default {
       time: '1023',
       postNum: '20',
       isSearchMode: false,
+      keyword: '',
     };
   },
   methods: {
-    async login() {
-      await auth.signIn();
-    },
-    async logout() {
-      await auth.signOut();
-    },
     search() {
+      if (this.keyword === '') {
+        console.log('전체보기 모드');
+      }
       this.isSearchMode = true;
     },
   },
-  mounted() {
-    auth.addStateChangeListener('login', (user) => {
-      console.log('alloc', user);
-    });
-  },
+
 };
 </script>
 

@@ -9,7 +9,6 @@ const resource = {
   firestore: firebase.firestore(),
 };
 
-console.log(store);
 // login, logout, state change
 const auth = (() => {
   const provider = new firebase.auth.GoogleAuthProvider();

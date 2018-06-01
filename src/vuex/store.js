@@ -6,14 +6,15 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
     user: {},
+    contentsData: {},
   },
   /** 반드시 동기여야 한다.
    * method 이름이 문자열 이므로 상수로 빼둘 필요가 있다.
    * call by : store.commit('method', arg)
    */
   mutations: {
-    increment(state, data) {
-      state.count += data.inc;
+    upload(state, data) {
+      state.contentsData = data;
     },
     setUser(state, data) {
       state.user = data;

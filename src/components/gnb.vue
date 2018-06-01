@@ -4,41 +4,33 @@
       .gnb_menuIcon
         i.material-icons.menuBtn(v-on:click="onSideMenu") menu
       .gnb_saveBtn
-        .mdl-button.mdl-js-button UPLOAD
+        .mdl-button.mdl-js-button(v-on:click="upload") UPLOAD
     .userInfo(v-bind:style="[isClicked ? visible : nonVisible]")
       i.material-icons.closeBtn(v-on:click="onSideMenu") close
       .userSection
         .user_imgWrapper
-          .user_img
+          .user_img(v-bind:style="{background: 'url('+ getUserPhotoUrl+')'}")
         .user
-          .user_name {{getUserData.displayName}}
-          .user_grade {{getUserData.grade}}
-        .writeBtn
-          .mdl-button.mdl-js-button.mdl-button--primary 글쓰기
-      .postingList
+          .user_name {{getUserName}}
+          .user_grade {{getUserGrade}}
+        .btnByLoginWrapper
+          .mdl-button.mdl-js-button.mdl-button--primary.writeBtn(v-on:click="changePage('editor')",
+          v-bind:class="{nonVisible : !isLogin}") 글쓰기
+          .mdl-button.mdl-js-button.mdl-button--primary.signInOutBtn(v-on:click="changeStatus").
+            {{ signStatus }}
+      .home
+        i.material-icons.home_icon home
+        .home_txt(v-on:click="changePage('/')") 블로그 홈으로 가기
+      .bottomSection
         .title < Contents List >
         .listWrapper
-          .list 자바스크립트 좋은 코드 만들기
-          .list 자바스크립트 좋은 코드 만들
-          .list 자바스크립트 좋은 코드 만들
-          .list 자바스크립트 좋은 코드 만들
-          .list 자바스크립트 좋은 코드 만들
-          .list 자바스크립트 좋은 코드 만들
-          .list 자바스크립트 좋은 코드 만들
-          .list 자바스크립트 좋은 코드 만들
-          .list 자바스크립트 좋은 코드 만들
-          .list 자바스크립트 좋은 코드 만들기
-          .list 자바스크립트 좋은 코드 만들
-          .list 자바스크립트 좋은 코드 만들
-          .list 자바스크립트 좋은 코드 만들
-          .list 자바스크립트 좋은 코드 만들
-          .list 자바스크립트 좋은 코드 만들
-          .list 자바스크립트 좋은 코드 만들
-          .list 자바스크립트 좋은 코드 만들
-          .list 자바스크립트 좋은 코드 만들
+          template(v-for="list in lists")
+            .list(v-on:click="changePage('content')") {{list}}
 </template>
 
 <script>
+import { auth } from '../firebase/firebase.api';
+
 export default {
   name: 'gnb',
   data() {
@@ -54,11 +46,40 @@ export default {
         opacity: 0,
         width: '0',
       },
+      lists: ['자바스크립트 좋은 코드 만들기',
+        '자바스크립트 나쁜 코드 만들기',
+        '자바스크립트 좋은 코드 만들기',
+        '자바스크립트 나쁜 코드 만들기',
+        '자바스크립트 좋은 코드 만들기',
+        '자바스크립트 나쁜 코드 만들기',
+        '자바스크립트 좋은 코드 만들기',
+        '자바스크립트 나쁜 코드 만들기',
+        '자바스크립트 좋은 코드 만들기',
+        '자바스크립트 나쁜 코드 만들기',
+        '자바스크립트 좋은 코드 만들기',
+        '자바스크립트 나쁜 코드 만들기'],
+      mode: 'home',
+      signStatus: '로그인',
+      isLogin: false,
     };
   },
   computed: {
-    getUserData() {
-      return this.$store.state.user;
+    getUserName() {
+      if (this.$store.state.user.displayName === undefined) {
+        return 'Guest';
+      }
+      return this.$store.state.user.displayName;
+    },
+    getUserGrade() {
+      if (this.$store.state.user.grade === undefined) {
+        return '로그인 하세요';
+      }
+      return this.$store.state.user.grade;
+    },
+    getUserPhotoUrl() {
+      if (this.$store.state.user.photoURL === undefined) {
+        return 'http://sloangroup.ca/wp-content/uploads/2013/06/user.jpg';
+      } return this.$store.state.user.photoURL;
     },
   },
   methods: {
@@ -66,10 +87,29 @@ export default {
       this.isClicked = !this.isClicked;
       return this.isClicked;
     },
-    // scrolledNav() {
-    //   const ele = document.getElementsByClassName('gnbWrapper');
-    //   ele.className += ' isScroll';
-    // },
+    upload() {
+      console.log('upload');
+    },
+    changePage(page) {
+      this.$router.push(page);
+    },
+    async changeStatus() {
+      console.log(this.isLogin, this.signStatus);
+      if (this.isLogin) {
+        await auth.signOut();
+        this.isLogin = false;
+        this.signStatus = '로그인';
+      } else {
+        await auth.signIn();
+        this.isLogin = true;
+        this.signStatus = '로그아웃';
+      }
+    },
+  },
+  mounted() {
+    auth.addStateChangeListener('login', (user) => {
+      console.log('alloc', user);
+    });
   },
 };
 </script>
@@ -134,11 +174,12 @@ export default {
           width: 100%
           padding: 50px 0 10px 0
           .user_img
+            background-size: contain !important
+            background-repeat: no-repeat
             width: 70px
             margin: auto
             height: 70px
             border-radius: 50%
-            background: red
         .user
           .user_name
             width: 100%
@@ -148,20 +189,42 @@ export default {
             width: 100%
             height: 15px
             font-size: 12px
-        .writeBtn
+        .btnByLoginWrapper
           padding: 20px
-      .postingList
+          .writeBtn
+            &.nonVisible
+              display: none
+      .bottomSection
         overflow-y: auto
         overflow-x: hidden
-        height: calc(100vh - 250px)
+        height: calc(100vh - 300px)
         white-space: nowrap
         .title
           font-size: 15px
           font-weight: bold
-        .list
+        .list, .home
           height: 40px
           line-height: 40px
           cursor: pointer
           &:hover
             color: darkslateblue
+      .home
+        line-height: 50px
+        height: 50px
+        background: #f0f0f0
+        cursor: pointer
+        .home_icon
+          height: 50px
+          font-size: 20px
+          vertical-align: center
+          line-height: 50px
+          padding: 0 10px 0 0
+          color: #898989
+          &:hover
+            color: darkslateblue
+        .home_txt
+          display: inline-block
+          vertical-align: top
+
+
 </style>
