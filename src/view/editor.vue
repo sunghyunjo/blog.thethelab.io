@@ -9,7 +9,7 @@
               v-on:click="changeBgColor(color)"
               v-bind:class="{selectColor : color.selected}")
           .title_txt
-            input.title(placeholder="제목을 입력하세요", autofocus='true')
+            input.title(v-model="title", placeholder="제목을 입력하세요", autofocus='true')
             input.subTitle(placeholder="소제목을 입력하세요")
             .tags
               template(v-for="tag in tags")
@@ -29,7 +29,7 @@
           template(v-for="tag in tags")
             .tagBtn.mdl-button.mdl-js-button(v-on:click="changeTagSelectMode(tag)",
             v-bind:class="{ selected : tag.selected}") {{ tag.name }}
-      textarea.editor(v-model="inputMarked",
+      textarea.editor(v-model="mdContents",
                       placeholder="md규칙으로 작성된 내용을 입력해주세요.",
                       v-bind:class="{ nonVisible : !isWriteMode }")
       .editor_parsed(v-html="parse",
@@ -49,7 +49,7 @@ export default {
   },
   computed: {
     parse() {
-      return marked(this.inputMarked);
+      return marked(this.mdContents);
     },
   },
   data() {
@@ -74,7 +74,7 @@ export default {
         { name: 'Algorithm', selected: false },
       ],
       isWriteMode: true, // 작성하기모드
-      inputMarked: '',
+      mdContents: '',
       isTagMode: false,
       nextMode: '미리보기',
       colors: [
@@ -87,7 +87,17 @@ export default {
       ],
       bgColor: '#a8a8a8',
       txtColor: '#ffffff',
+      title: '',
     };
+  },
+  // watch를 사용한 이유 : 임시저장.
+  watch: {
+    mdContents(data) {
+      this.$store.commit('setMdData', data);
+    },
+    title(data) {
+      this.$store.commit('setTitle', data);
+    },
   },
   methods: {
     changeMode() {
@@ -104,6 +114,7 @@ export default {
     },
     changeTagSelectMode(tag) {
       tag.selected = !tag.selected;
+      this.$store.commit('setTag', this.tags);
     },
     changeBgColor(color) {
       _.forEach(this.colors, (c) => {
@@ -114,6 +125,7 @@ export default {
       color.selected = !color.selected;
       this.bgColor = color.bg;
       this.txtColor = color.text;
+      this.$store.commit('setColor', [this.bgColor, this.txtColor]);
     },
   },
 };

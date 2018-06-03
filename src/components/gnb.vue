@@ -82,13 +82,22 @@ export default {
       } return this.$store.state.user.photoURL;
     },
   },
+  watch: {
+    currentMode() {
+      if (this.$route.path === 'editor') {
+        this.mode = 'editor';
+        return this.mode;
+      }
+      return '';
+    },
+  },
   methods: {
     onSideMenu() {
       this.isClicked = !this.isClicked;
       return this.isClicked;
     },
     upload() {
-      console.log('upload');
+      this.$store.commit('upload');
     },
     changePage(page) {
       this.$router.push(page);
