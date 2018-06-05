@@ -1,7 +1,7 @@
 <template lang="pug">
   .editorWrapper
     .titleSection
-      .title_bg(v-bind:style="{background: bgColor}")
+      .title_bg(v-bind:style="{background: selectedColor.bg}")
         .title_txtWrapper
           .bg_colorPicker
             template(v-for="color in colors")
@@ -9,47 +9,61 @@
               v-on:click="changeBgColor(color)"
               v-bind:class="{selectColor : color.selected}")
           .title_txt
-            input.title(placeholder="제목을 입력하세요", autofocus='true')
-            input.subTitle(placeholder="소제목을 입력하세요")
+            input.title(v-model="title", placeholder="제목을 입력하세요", autofocus='true')
+            input.subTitle(placeholder="소제목을 입력하세요", v-model="subTitle")
+            input.subTitle(v-model="keywordModel",
+            placeholder="키워드", v-on:keyup.13="keywordSubmit")
             .tags
-              template(v-for="tag in tags")
-                .tag(v-if="tag.selected"
-                v-bind:style="{color: txtColor}") {{ '#' + tag.name }}
+              template(v-for="keyword in keywords")
+                .tag(v-bind:style="{color: selectedColor.text}")
+                  .text {{ '#' + keyword }}
+                    .remove-btn(v-on:click="removeKeyword(keyword)")
+                      i.material-icons close
     .contentSection
       .top
-        .tagSelectorSection
+        //.tagSelectorSection
           .buttonWrapper
             .mdl-button.mdl-js-button(v-on:click="onTag",
             v-bind:class="{ selected : isTagMode }") 태그선택
         .buttonSection
           .buttonWrapper
-            .mdl-button.mdl-js-button(v-on:click="changeMode") {{ nextMode }}
-      .tagSelection(v-bind:class="{ nonVisible : !isTagMode }")
+            .mdl-button.mdl-js-button(v-on:click="changeMode") {{isWriteMode ? '미리보기' : '작성하기'}}
+            .mdl-button.mdl-js-button(v-on:click="onDeleteContent") 삭제하기
+      //.tagSelection(v-bind:class="{ nonVisible : !isTagMode }")
         .tagWrapper
           template(v-for="tag in tags")
             .tagBtn.mdl-button.mdl-js-button(v-on:click="changeTagSelectMode(tag)",
             v-bind:class="{ selected : tag.selected}") {{ tag.name }}
-      textarea.editor(v-model="inputMarked",
-                      placeholder="md규칙으로 작성된 내용을 입력해주세요.",
-                      v-bind:class="{ nonVisible : !isWriteMode }")
+      textarea.editor(v-model="mdContents",
+      placeholder="md규칙으로 작성된 내용을 입력해주세요.",
+      v-bind:class="{ nonVisible : !isWriteMode }")
       .editor_parsed(v-html="parse",
-                    v-bind:class="{ nonVisible : isWriteMode }")
+      v-bind:class="{ nonVisible : isWriteMode }")
 </template>
 
 <script>
 /* eslint-disable no-param-reassign */
 
+import * as _ from 'lodash';
 import marked from 'marked';
 import gnb from '../components/gnb';
+import eventBus from '../eventbus/eventbus';
+import { content } from '../firebase/firebase.api';
 
 export default {
   name: 'editor',
+  props: {
+    contentId: {
+      type: String,
+      required: true,
+    },
+  },
   components: {
     gnb,
   },
   computed: {
     parse() {
-      return marked(this.inputMarked);
+      return marked(this.mdContents);
     },
   },
   data() {
@@ -74,7 +88,7 @@ export default {
         { name: 'Algorithm', selected: false },
       ],
       isWriteMode: true, // 작성하기모드
-      inputMarked: '',
+      mdContents: '',
       isTagMode: false,
       nextMode: '미리보기',
       colors: [
@@ -85,25 +99,54 @@ export default {
         { bg: '#009738', text: '#ff9388', selected: false },
         { bg: '#863c97', text: '#ffffff', selected: false },
       ],
-      bgColor: '#a8a8a8',
-      txtColor: '#ffffff',
+      selectedColor: {
+        bg: '#a8a8a8',
+        text: '#ffffff',
+        selected: true,
+      },
+      subTitle: '',
+      title: '',
+      keywordModel: '',
+      keywords: [],
     };
   },
+  // watch를 사용한 이유 : 임시저장.
+  watch: {
+    mdContents(data) {
+      this.$store.commit('setMdData', data);
+    },
+    title(data) {
+      this.$store.commit('setTitle', data);
+    },
+  },
   methods: {
+    keywordSubmit() {
+      if (this.keywords.length > 6) return;
+      const keyword = this.keywordModel.replace(/ /gi, '');
+      if (_.isEmpty(keyword)) return;
+      if (_.some(this.keywords, k => k === keyword)) return;
+      this.keywords.push(keyword);
+      this.keywordModel = '';
+    },
+    removeKeyword(keyword) {
+      this.keywords = _.filter(this.keywords, k => k !== keyword);
+    },
     changeMode() {
       this.isWriteMode = !this.isWriteMode;
-      if (this.isWriteMode) {
-        this.nextMode = '미리보기';
-      } else {
-        this.nextMode = '작성하기';
-      }
     },
     onTag() {
       this.isTagMode = !this.isTagMode;
       return this.isTagMode;
     },
+    async onDeleteContent() {
+      const ret = await content.delete(this.$store.getters.getUser, this.contentId);
+    },
     changeTagSelectMode(tag) {
       tag.selected = !tag.selected;
+      this.$store.commit('setTag', this.tags);
+    },
+    getSelectedTags() {
+      return _.filter(this.tags, tag => tag.selected);
     },
     changeBgColor(color) {
       _.forEach(this.colors, (c) => {
@@ -111,10 +154,25 @@ export default {
           c.selected = false;
         }
       });
-      color.selected = !color.selected;
-      this.bgColor = color.bg;
-      this.txtColor = color.text;
+      color.selected = true;
+      this.selectedColor = color;
     },
+  },
+  created() {
+    eventBus.offListener(eventBus.Events.editor.Upload);
+    eventBus.setListener(eventBus.Events.editor.Upload, async () => {
+      const user = this.$store.getters.getUser;
+      const data = {
+        md: this.mdContents,
+        subTitle: this.subTitle,
+        title: this.title,
+        keyword: this.keywords,
+        color: this.selectedColor,
+      };
+      await content.create(user, this.contentId, data);
+    });
+  },
+  mounted() {
   },
 };
 </script>
@@ -126,11 +184,14 @@ textarea, input
   background: transparent
   &:focus
     outline: none
+
 input
   color: white
   caret-color: white
+
 .editorWrapper
   width: 100%
+  min-height: 100vh
   height: auto
   .titleSection
     position: absolute
@@ -186,14 +247,39 @@ input
               opacity: .7
           .tags
             width: inherit
-            height: 50px
             font-family: 'Roboto Mono', monospace
             font-size: 15px
             text-align: left
             .tag
               display: inline-block
-              padding: 0 5px
-
+              cursor: pointer
+              position: relative
+              height: 27px
+              line-height: 27px
+              margin-right: 12px
+              margin-bottom: 8px
+              .text
+                background: rgba(255, 255, 255, .5)
+                padding: 0 12px
+                border-radius: 18px
+                display: inline-block
+                vertical-align: top
+                height: 100%
+                line-height: 27px
+                .remove-btn
+                  margin-left: 8px
+                  color: inherit
+                  display: inline-block
+                  padding-top: 1px
+                  cursor: pointer
+                  i
+                    border-radius: 50%
+                    background: rgba(0, 0, 0, .2)
+                    padding: 1px
+                    color: #ffffff
+                    font-size: 12px
+                    &:hover
+                      background: rgba(0, 0, 0, .5)
   .contentSection
     width: 700px
     height: auto
@@ -225,6 +311,7 @@ input
           vertical-align: top
           padding: 0 5px
           .mdl-button
+            margin-left: 8px
             border: .5px solid #bebebe
             border-radius: 20px
     .tagSelection

@@ -15,13 +15,15 @@ export default new Router({
       component: Main,
     },
     {
-      path: '/editor',
+      path: '/editor/:contentId',
       name: 'editor',
+      props: true,
       component: editor,
     },
     {
-      path: '/content',
+      path: '/content/:contentId',
       name: 'content',
+      props: true,
       component: content,
     },
   ],

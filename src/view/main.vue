@@ -1,27 +1,50 @@
-<template lang = "pug">
+<template lang="pug">
   .mainWrapper
     .main_gradient(v-bind:class="{searched : isSearchMode}")
     .main(v-bind:class="{searched : isSearchMode}")
-      .main_mention(v-bind:class="{searched : isSearchMode}").
-        "{{grade}}" {{userName}}님 </br> {{mention}}
+      .main_mention(v-bind:class="{searched : isSearchMode}" v-html="getMainText").
       .searchWrapper
         input.search(type='search', autofocus='true',
         placeholder="관심있는 키워드를 입력하세요.", v-model="keyword")
         i.material-icons.searchBtn(v-on:click="search") search
+        .searchedItemGroup
+          template(v-for="item in searchItems")
+            .searchedItem(v-on:click="changePage('/content/'+item.contentId)")
+              .title {{item.title}}
+              .sub-title {{item.subTitle}}
       .commentWrapper
-        .comment {{userName}}님은 THETHELAB과 함께 <strong>{{time}}</strong>시간을 보냈습니다.
-        </br> 이곳에 <strong>{{postNum}}</strong>개의 지식을 공유했습니다.
-      .mdl-button.mdl-js-button.login(v-on:click ="search") 전체보기
+        .comment(v-html="getBottomText")
+        .comment {{user}}
+      //.mdl-button.mdl-js-button.login(v-on:click ="search") 전체보기
       post-list.postList(v-bind:class="{searched : isSearchMode}")
 </template>
 
 <script>
+import * as _ from 'lodash';
 import list from '../components/list';
+import { content } from '../firebase/firebase.api';
+
 
 export default {
   name: 'Main',
   components: {
     'post-list': list,
+  },
+  computed: {
+    getMainText() {
+      if (_.isEmpty(this.$store.getters.getUser)) {
+        return '더더랩의 기술블로그<br>( ~ . ~ )';
+      }
+      return `"${this.$store.getters.getUser.grade}" ${this.$store.getters.getUser.displayName}님<br>오늘도 열심히!`;
+    },
+    getBottomText() {
+      if (_.isEmpty(this.$store.getters.getUser)) return '';
+      const creationTime = this.$store.getters.getUser.creationTime;
+      const currentTime = new Date().getTime();
+      console.log(currentTime, creationTime);
+      return `${this.$store.getters.getUser}`;
+      // return `${this.$store.getters.getUser.displayName}님은 THETHELAB과 함께 시간을 보냈습니다.`;
+    },
   },
   data() {
     return {
@@ -32,15 +55,26 @@ export default {
       postNum: '20',
       isSearchMode: false,
       keyword: '',
+      searchItems: [],
+      user: this.$store.getters.getUser,
     };
   },
+  watch: {
+    keyword() {
+      this.getSearchItems();
+    },
+  },
   methods: {
+    changePage(path) {
+      this.$router.push({ path });
+    },
     search() {
-      if (this.keyword === '') {
-        console.log('전체보기 모드');
-      }
       this.isSearchMode = true;
     },
+    getSearchItems: _.debounce(
+      async function () {
+        this.searchItems = await content.find(this.keyword.split(' '));
+      }, 500),
   },
 
 };
@@ -48,27 +82,54 @@ export default {
 
 <style lang="sass" scoped>
 @import "../global"
+.searchedItemGroup
+  width: 100%
+  height: calc(100% - 30px)
+  margin-top: 20px
+  left: 0
+  color: #fff
+  text-align: left
+  overflow: auto
+  .searchedItem
+    padding: 8px
+    height: 56px
+    cursor: pointer
+    &:hover
+      background: rgba(255, 255, 255, 0.15)
+    .title
+      text-shadow: 0 0 15px #000000
+      font-weight: 600
+      font-size: 18px
+      height: 24px
+      line-height: 24px
+    .sub-title
+      height: 14px
+      font-size: 14px
+      line-height: 18px
+  &::-webkit-scrollbar
+    display: none
 
 .mainWrapper
   width: 100%
+  min-height: 680px
   height: 100vh
-  background: url("../assets/bg3.jpg") no-repeat center
+  background: url("../assets/image01.jpg") no-repeat center
   background-size: cover
   @media #{$phone}
     height: 100%
   .main_gradient
-    position: absolute
+    position: fixed
     top: 0
     left: 0
     width: 100%
-    height: 100vh
+    height: 100%
     background: radial-gradient(rgba(0, 0, 0, 0.09), rgba(0, 0, 0, 0.59))
     transition: background .3s
     &.searched
       background: white
   .main
     width: 700px
-    height: 100vh
+    height: 100%
     margin: auto
     position: relative
     text-shadow: 0 0 15px #000000
@@ -90,7 +151,7 @@ export default {
       line-height: 1.4
       text-align: center
       position: relative
-      top: 33vh
+      top: 33%
       font-size: 60px
       color: white
       opacity: .9
@@ -103,16 +164,17 @@ export default {
         line-height: 1.2
     .searchWrapper
       transition: opacity .5s, top .5s
-      position: relative
-      top: 38vh
-      height: auto
+      position: fixed
+      left: calc(50% - 175px)
+      top: 55%
+      height: calc(45% - 120px)
       margin: auto
       width: 350px
       @media #{$phone}
         width: 60vw
         left: -10px
       input.search
-        font-size: 20px
+        font-size: 18px
         height: 30px
         line-height: 30px
         text-align: center
@@ -124,7 +186,7 @@ export default {
         color: white
         caret-color: white
         &::placeholder
-          color: white
+          color: rgba(255, 255, 255, 0.85)
         &:focus
           outline: none
         &::-webkit-search-cancel-button
@@ -151,10 +213,12 @@ export default {
       font-size: 12px
       @media #{$phone}
         font-size: 10px
+
 .postList
   display: none
   &.searched
     display: block
+
 .mdl-button
   border: .5px solid #bebebe
   border-radius: 20px

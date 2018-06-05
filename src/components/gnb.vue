@@ -1,35 +1,37 @@
 <template lang="pug">
   .gnbWrapper
     .gnb
-      .gnb_menuIcon
-        i.material-icons.menuBtn(v-on:click="onSideMenu") menu
-      .gnb_saveBtn
-        .mdl-button.mdl-js-button(v-on:click="upload") UPLOAD
-    .userInfo(v-bind:style="[isClicked ? visible : nonVisible]")
-      i.material-icons.closeBtn(v-on:click="onSideMenu") close
-      .userSection
-        .user_imgWrapper
-          .user_img(v-bind:style="{background: 'url('+ getUserPhotoUrl+')'}")
-        .user
-          .user_name {{getUserName}}
-          .user_grade {{getUserGrade}}
-        .btnByLoginWrapper
-          .mdl-button.mdl-js-button.mdl-button--primary.writeBtn(v-on:click="changePage('editor')",
-          v-bind:class="{nonVisible : !isLogin}") 글쓰기
-          .mdl-button.mdl-js-button.mdl-button--primary.signInOutBtn(v-on:click="changeStatus").
-            {{ signStatus }}
-      .home
-        i.material-icons.home_icon home
-        .home_txt(v-on:click="changePage('/')") 블로그 홈으로 가기
-      .bottomSection
-        .title < Contents List >
-        .listWrapper
-          template(v-for="list in lists")
-            .list(v-on:click="changePage('content')") {{list}}
+      i.material-icons.gnb-command.icon(v-on:click="onSideMenu") menu
+      .gnb-command.title(v-on:click="changePage('/')") THETHELAB BLOG
+      .flex-empty
+      .gnb-command(v-on:click="upload") UPLOAD
+    .side-nav(v-bind:class="{ visible : isClicked}")
+      .side-nav-cover
+        i.material-icons.closeBtn(v-on:click="onSideMenu") close
+        .userSection
+          .user_imgWrapper
+            .user_img(v-bind:style="{background: 'url('+ getUserPhotoUrl+')'}")
+          .user-name-field
+            .user_name {{getUserName}}
+            .user_grade {{getUserGrade}}
+          .user-commands
+            .flex-empty
+            .button(v-if='isLogin', v-on:click="onCreateDocument()") 글쓰기
+            .button(v-on:click="changeStatus") {{ isLogin ? '로그아웃' : '로그인' }}
+            .flex-empty
+        .bottomSection
+          .title - 작성글 목록 -
+          .listWrapper
+            template(v-for="list in contentList")
+              .list(v-on:click="changePage('/content/' + list.contentId)") {{list.title}}
 </template>
 
 <script>
-import { auth } from '../firebase/firebase.api';
+import * as _ from 'lodash';
+import uuid from 'uuid/v1';
+import { auth, content } from '../firebase/firebase.api';
+import eventBus from '../eventbus/eventbus';
+
 
 export default {
   name: 'gnb',
@@ -46,18 +48,7 @@ export default {
         opacity: 0,
         width: '0',
       },
-      lists: ['자바스크립트 좋은 코드 만들기',
-        '자바스크립트 나쁜 코드 만들기',
-        '자바스크립트 좋은 코드 만들기',
-        '자바스크립트 나쁜 코드 만들기',
-        '자바스크립트 좋은 코드 만들기',
-        '자바스크립트 나쁜 코드 만들기',
-        '자바스크립트 좋은 코드 만들기',
-        '자바스크립트 나쁜 코드 만들기',
-        '자바스크립트 좋은 코드 만들기',
-        '자바스크립트 나쁜 코드 만들기',
-        '자바스크립트 좋은 코드 만들기',
-        '자바스크립트 나쁜 코드 만들기'],
+      contentList: [],
       mode: 'home',
       signStatus: '로그인',
       isLogin: false,
@@ -79,7 +70,8 @@ export default {
     getUserPhotoUrl() {
       if (this.$store.state.user.photoURL === undefined) {
         return 'http://sloangroup.ca/wp-content/uploads/2013/06/user.jpg';
-      } return this.$store.state.user.photoURL;
+      }
+      return this.$store.state.user.photoURL;
     },
   },
   methods: {
@@ -88,88 +80,103 @@ export default {
       return this.isClicked;
     },
     upload() {
-      console.log('upload');
+      eventBus.emit(eventBus.Events.editor.Upload);
+      // this.$store.commit('upload');
     },
-    changePage(page) {
-      this.$router.push(page);
+    changePage(path) {
+      this.$router.push({ path });
     },
     async changeStatus() {
       console.log(this.isLogin, this.signStatus);
       if (this.isLogin) {
         await auth.signOut();
-        this.isLogin = false;
-        this.signStatus = '로그인';
       } else {
         await auth.signIn();
-        this.isLogin = true;
-        this.signStatus = '로그아웃';
       }
+    },
+    onCreateDocument() {
+      this.$router.push({ path: `/editor/${uuid()}` });
     },
   },
   mounted() {
-    auth.addStateChangeListener('login', (user) => {
-      console.log('alloc', user);
+    auth.addStateChangeListener('login', async (user) => {
+      console.log(user);
+      if (_.isNil(user)) {
+        this.isLogin = false;
+      } else {
+        this.isLogin = true;
+        this.contentList = await content.getUserContent(user.uid);
+      }
     });
   },
 };
 </script>
 
 <style lang="sass" scoped>
-  .gnbWrapper
+.flex-empty
+  flex: 1
+
+.flex-space
+  width: 16px
+
+.font[family="dokdo"]
+  font-family: 'East Sea Dokdo', cursive
+
+.gnbWrapper
+  position: fixed
+  top: 0
+  left: 0
+  z-index: 100
+  width: 100vw
+  height: 50px
+  background: transparent
+  line-height: 50px
+  .gnb
+    width: 100%
     position: fixed
-    top: 0
-    left: 0
-    z-index: 100
-    width: 100vw
-    height: 50px
-    background: transparent
-    line-height: 50px
-    &.isScroll
-      .gnb
-        .gnb_menuIcon, .gnb_saveBtn
-          color: black
-        .gnb_menuIcon
-          .menuBtn
-            &:hover
-              color: darkslateblue
-    .gnb
-      .gnb_menuIcon, .gnb_saveBtn
-        display: inline-block
-        vertical-align: top
-        position: absolute
-        color: white
-      .gnb_saveBtn
-        right: 10px
-        height: 50px
-        .mdl-js-button
-          color: white
-      .gnb_menuIcon
-        left: 20px
-        padding: 6.5px 0
+    display: flex
+    .gnb-command
+      &.title
+        padding: 0 !important
+        font-size: 16px
+        line-height: 50px
+      cursor: pointer
+      height: 100%
+      padding: 0 8px
+      color: #fff
+      &:hover
+        border-bottom: solid 1px #fff
+      &.icon
+        line-height: 50px
         width: 50px
-        .menuBtn
-          &:hover
-            color: black
-            cursor: pointer
-    .userInfo
+  .side-nav
+    &.visible
       width: 250px
-      height: 100vh
-      background: white
-      position: relative
-      transition: visibility .1s, opacity .1s, width .4s
-      box-shadow: 0 0 5px #bfbfbf
+      opacity: 1
+    height: 100vh
+    overflow-x: hidden
+    white-space: nowrap
+    background: white
+    border-right: solid 1px #ccc
+    position: fixed
+    transition: width .3s, opacity .3s
+    opacity: 0
+    width: 0
+    .side-nav-cover
+      width: 250px
+      height: 100%
       .closeBtn
         position: absolute
         right: 10px
         top: 10px
         cursor: pointer
         &:hover
-          background : #e9e9e9
+          background: #e9e9e9
       .userSection
         width: 100%
         height: 250px
         text-align: center
-        background: #eaeaea
+        background: #f6f6f6
         .user_imgWrapper
           width: 100%
           padding: 50px 0 10px 0
@@ -180,17 +187,32 @@ export default {
             margin: auto
             height: 70px
             border-radius: 50%
-        .user
+            box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.15)
+        .user-name-field
           .user_name
             width: 100%
-            height: 20px
-            font-size: 20px
+            font-size: 18px
+            line-height: 28px
           .user_grade
             width: 100%
-            height: 15px
-            font-size: 12px
-        .btnByLoginWrapper
+            font-size: 14px
+            line-height: 18px
+        .user-commands
           padding: 20px
+          display: flex
+          .button
+            font-size: 14px
+            color: #444
+            border-radius: 18px
+            background: #fff
+            height: 36px
+            line-height: 36px
+            padding: 0 24px
+            margin: 4px
+            width: auto
+            cursor: pointer
+            box-shadow: 0 0 3px 0px rgba(0, 0, 0, 0.3)
+            transition: box-shadow .3s
           .writeBtn
             &.nonVisible
               display: none
@@ -199,32 +221,33 @@ export default {
         overflow-x: hidden
         height: calc(100vh - 300px)
         white-space: nowrap
+        border-top: solid 1px #ddd
         .title
-          font-size: 15px
-          font-weight: bold
+          font-size: 12px
+          font-weight: 500
         .list, .home
           height: 40px
           line-height: 40px
           cursor: pointer
           &:hover
             color: darkslateblue
-      .home
-        line-height: 50px
+    .home
+      line-height: 50px
+      height: 50px
+      background: #f0f0f0
+      cursor: pointer
+      .home_icon
         height: 50px
-        background: #f0f0f0
-        cursor: pointer
-        .home_icon
-          height: 50px
-          font-size: 20px
-          vertical-align: center
-          line-height: 50px
-          padding: 0 10px 0 0
-          color: #898989
-          &:hover
-            color: darkslateblue
-        .home_txt
-          display: inline-block
-          vertical-align: top
+        font-size: 20px
+        vertical-align: center
+        line-height: 50px
+        padding: 0 10px 0 0
+        color: #898989
+        &:hover
+          color: darkslateblue
+      .home_txt
+        display: inline-block
+        vertical-align: top
 
 
 </style>

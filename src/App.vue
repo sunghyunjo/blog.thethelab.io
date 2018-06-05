@@ -1,13 +1,17 @@
 <template lang="pug">
   #app
+    spinner(ref="spinner")
     gnb
-    router-view
+    transition(name="slide-fade")
+      router-view
 </template>
 
 <script>
 
 import { store } from './vuex/store';
 import gnb from './components/gnb';
+import spinner from './components/spinner.simple';
+import eventbus from './eventbus/eventbus';
 
 export default {
   name: 'App',
@@ -15,11 +19,55 @@ export default {
   methods: {},
   components: {
     gnb,
+    spinner,
+  },
+  created() {
+    eventbus.offListener(eventbus.Events.spinner.active);
+    eventbus.offListener(eventbus.Events.spinner.disable);
+    eventbus.setListener(eventbus.Events.spinner.active, () => {
+      console.log('enable!!');
+      this.$refs.spinner.enable();
+    });
+    eventbus.setListener(eventbus.Events.spinner.disable, () => {
+      this.$refs.spinner.disable();
+    });
   },
 };
 </script>
 
 <style>
+
+.slide-fade-enter-active {
+  transition: all .2s;
+}
+.slide-fade-leave-active {
+  transition: all .2s;
+}
+.slide-fade-enter, .slide-fade-leave-to
+  /* .slide-fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+body {
+  min-height: 600px;
+  min-width: 400px;
+}
+
+/**::-webkit-scrollbar-track {*/
+/*background-color: rgba(255, 255, 255, 0);*/
+/*width : 6px;*/
+/*}*/
+
+/**::-webkit-scrollbar {*/
+/*width: 10px;*/
+/*background: rgba(255, 255, 255, 0);*/
+/*}*/
+
+/**::-webkit-scrollbar-thumb {*/
+/*border-radius: 3px;*/
+/*background-color: #333;*/
+/*}*/
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   /*font-family: 'NanumSquare', sans-serif;*/
