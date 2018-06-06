@@ -32,7 +32,6 @@ import uuid from 'uuid/v1';
 import { auth, content } from '../firebase/firebase.api';
 import eventBus from '../eventbus/eventbus';
 
-
 export default {
   name: 'gnb',
   data() {
@@ -81,13 +80,12 @@ export default {
     },
     upload() {
       eventBus.emit(eventBus.Events.editor.Upload);
-      // this.$store.commit('upload');
     },
     changePage(path) {
       this.$router.push({ path });
     },
     async changeStatus() {
-      console.log(this.isLogin, this.signStatus);
+      // console.log(this.isLogin, this.signStatus);
       if (this.isLogin) {
         await auth.signOut();
       } else {
@@ -103,6 +101,7 @@ export default {
       console.log(user);
       if (_.isNil(user)) {
         this.isLogin = false;
+        this.contentList = [];
       } else {
         this.isLogin = true;
         this.contentList = await content.getUserContent(user.uid);

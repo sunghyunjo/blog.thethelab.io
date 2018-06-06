@@ -25,7 +25,6 @@ export default {
     eventbus.offListener(eventbus.Events.spinner.active);
     eventbus.offListener(eventbus.Events.spinner.disable);
     eventbus.setListener(eventbus.Events.spinner.active, () => {
-      console.log('enable!!');
       this.$refs.spinner.enable();
     });
     eventbus.setListener(eventbus.Events.spinner.disable, () => {

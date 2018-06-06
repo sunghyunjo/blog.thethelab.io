@@ -110,15 +110,6 @@ export default {
       keywords: [],
     };
   },
-  // watch를 사용한 이유 : 임시저장.
-  watch: {
-    mdContents(data) {
-      this.$store.commit('setMdData', data);
-    },
-    title(data) {
-      this.$store.commit('setTitle', data);
-    },
-  },
   methods: {
     keywordSubmit() {
       if (this.keywords.length > 6) return;
@@ -170,6 +161,8 @@ export default {
         color: this.selectedColor,
       };
       await content.create(user, this.contentId, data);
+      alert('성공적으로 업로드 되었습니다.');
+      this.$router.push({ path: `/content/${this.contentId}` });
     });
   },
   mounted() {

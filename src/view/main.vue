@@ -14,8 +14,6 @@
               .sub-title {{item.subTitle}}
       .commentWrapper
         .comment(v-html="getBottomText")
-        .comment {{user}}
-      //.mdl-button.mdl-js-button.login(v-on:click ="search") 전체보기
       post-list.postList(v-bind:class="{searched : isSearchMode}")
 </template>
 
@@ -23,7 +21,6 @@
 import * as _ from 'lodash';
 import list from '../components/list';
 import { content } from '../firebase/firebase.api';
-
 
 export default {
   name: 'Main',
@@ -37,13 +34,14 @@ export default {
       }
       return `"${this.$store.getters.getUser.grade}" ${this.$store.getters.getUser.displayName}님<br>오늘도 열심히!`;
     },
+    // TODO 시간 undefined 해결하기..
     getBottomText() {
       if (_.isEmpty(this.$store.getters.getUser)) return '';
-      const creationTime = this.$store.getters.getUser.creationTime;
+      const creationTime = this.$store.getters.getUser.time;
       const currentTime = new Date().getTime();
-      console.log(currentTime, creationTime);
-      return `${this.$store.getters.getUser}`;
-      // return `${this.$store.getters.getUser.displayName}님은 THETHELAB과 함께 시간을 보냈습니다.`;
+      console.log('creationTime:  ', creationTime);
+      const diffTime = (currentTime - creationTime) / 60000;
+      return `${this.$store.getters.getUser.displayName}님은 THETHELAB과 함께 ${diffTime}분을 보냈습니다.`;
     },
   },
   data() {
@@ -148,10 +146,12 @@ export default {
       transition: opacity .3s, top .3s
       width: 500px
       margin: auto
+      height: auto
       line-height: 1.4
       text-align: center
-      position: relative
+      position: fixed
       top: 33%
+      left: calc(50% - 250px)
       font-size: 60px
       color: white
       opacity: .9
@@ -166,7 +166,7 @@ export default {
       transition: opacity .5s, top .5s
       position: fixed
       left: calc(50% - 175px)
-      top: 55%
+      top: 70%
       height: calc(45% - 120px)
       margin: auto
       width: 350px
@@ -204,8 +204,8 @@ export default {
         color: white
     .commentWrapper
       transition: opacity .5s, bottom .5s
-      position: absolute
-      width: 100%
+      position: fixed
+      width: inherit
       height: auto
       line-height: 1
       bottom: 50px
