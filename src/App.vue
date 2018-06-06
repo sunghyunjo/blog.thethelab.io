@@ -22,6 +22,7 @@ export default {
     spinner,
   },
   created() {
+    window.removeEventListener('scroll', this.scroll);
     eventbus.offListener(eventbus.Events.spinner.active);
     eventbus.offListener(eventbus.Events.spinner.disable);
     eventbus.setListener(eventbus.Events.spinner.active, () => {
@@ -30,6 +31,11 @@ export default {
     eventbus.setListener(eventbus.Events.spinner.disable, () => {
       this.$refs.spinner.disable();
     });
+  },
+  method: {
+    scroll() {
+      console.log('event');
+    },
   },
 };
 </script>

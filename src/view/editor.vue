@@ -94,9 +94,9 @@ export default {
       colors: [
         { bg: '#a8a8a8', text: '#ffffff', selected: true },
         { bg: '#e7b62f', text: '#7C4108', selected: false },
-        { bg: '#ff908e', text: '#a2e5ff', selected: false },
-        { bg: '#215dbe', text: '#e5901f', selected: false },
-        { bg: '#009738', text: '#ff9388', selected: false },
+        { bg: '#ff908e', text: '#78a7b8', selected: false },
+        { bg: '#215dbe', text: '#905c14', selected: false },
+        { bg: '#009738', text: '#be6c65', selected: false },
         { bg: '#863c97', text: '#ffffff', selected: false },
       ],
       selectedColor: {

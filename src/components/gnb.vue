@@ -49,7 +49,6 @@ export default {
       },
       contentList: [],
       mode: 'home',
-      signStatus: '로그인',
       isLogin: false,
     };
   },
@@ -85,7 +84,6 @@ export default {
       this.$router.push({ path });
     },
     async changeStatus() {
-      // console.log(this.isLogin, this.signStatus);
       if (this.isLogin) {
         await auth.signOut();
       } else {
@@ -106,6 +104,7 @@ export default {
         this.isLogin = true;
         this.contentList = await content.getUserContent(user.uid);
       }
+      console.log('로그인상태:', this.isLogin);
     });
   },
 };
@@ -135,6 +134,7 @@ export default {
     position: fixed
     display: flex
     .gnb-command
+      transition: transform .3s
       &.title
         padding: 0 !important
         font-size: 16px
@@ -144,7 +144,7 @@ export default {
       padding: 0 8px
       color: #fff
       &:hover
-        border-bottom: solid 1px #fff
+        font-weight: 900
       &.icon
         line-height: 50px
         width: 50px
