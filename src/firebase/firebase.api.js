@@ -16,7 +16,7 @@ resource.firestore.settings({ timestampsInSnapshots: true });
 
 const content = {
   async getUserContent(userId) {
-    console.log(userId);
+    // console.log(userId);
     const dataListSnapshot = await resource.firestore.collection('user_content').doc(userId).get();
     if (!dataListSnapshot.exists) return [];
 
@@ -123,7 +123,7 @@ const auth = (() => {
       return userData;
     }
     _.assign(user, {
-      creationTime: new Date().getTime(),
+      time: new Date().getTime(),
       nickname: '',
       grade: '무지랭이',
       mention: '',

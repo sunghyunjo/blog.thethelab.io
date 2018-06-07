@@ -94,9 +94,9 @@ export default {
       colors: [
         { bg: '#a8a8a8', text: '#ffffff', selected: true },
         { bg: '#e7b62f', text: '#7C4108', selected: false },
-        { bg: '#ff908e', text: '#a2e5ff', selected: false },
-        { bg: '#215dbe', text: '#e5901f', selected: false },
-        { bg: '#009738', text: '#ff9388', selected: false },
+        { bg: '#ff908e', text: '#78a7b8', selected: false },
+        { bg: '#215dbe', text: '#905c14', selected: false },
+        { bg: '#009738', text: '#be6c65', selected: false },
         { bg: '#863c97', text: '#ffffff', selected: false },
       ],
       selectedColor: {
@@ -109,15 +109,6 @@ export default {
       keywordModel: '',
       keywords: [],
     };
-  },
-  // watch를 사용한 이유 : 임시저장.
-  watch: {
-    mdContents(data) {
-      this.$store.commit('setMdData', data);
-    },
-    title(data) {
-      this.$store.commit('setTitle', data);
-    },
   },
   methods: {
     keywordSubmit() {
@@ -170,6 +161,8 @@ export default {
         color: this.selectedColor,
       };
       await content.create(user, this.contentId, data);
+      alert('성공적으로 업로드 되었습니다.');
+      this.$router.push({ path: `/content/${this.contentId}` });
     });
   },
   mounted() {
