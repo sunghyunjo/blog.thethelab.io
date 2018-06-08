@@ -38,7 +38,6 @@ export default {
       if (_.isEmpty(this.$store.getters.getUser)) return '';
       const creationTime = this.$store.getters.getUser.time;
       const currentTime = new Date().getTime();
-      console.log('creationTime:  ', creationTime);
       const diffTime = (currentTime - creationTime) / 60000;
       return `${this.$store.getters.getUser.displayName}님은 THETHELAB과 함께 ${diffTime}분을 보냈습니다.`;
     },

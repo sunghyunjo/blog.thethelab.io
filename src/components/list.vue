@@ -1,20 +1,22 @@
 <template lang="pug">
-.listWrapper
-  .list
-    .list_title {{ title }}
-    .list_subTitle {{ subTitle }}
-  .tags
-    template(v-for="tag in tags")
-      .tag(v-on:click="searchContents(tag)") {{'#'+tag}}
-  .userSection
-    .by by
-    .user(v-on:click="searchContents(user)") {{userName}}
-    .grade {{userGrade}}
-    .divideCircle
-    .date {{date}}
+  .listWrapper
+    .list(v-on:click="changePage")
+      .list_title {{ title }}
+      .list_subTitle {{ subTitle }}
+    .tags
+      template(v-for="tag in tags")
+        .tag(v-on:click="searchContents(tag)") {{'#'+tag}}
+    .userSection(v-bind:class='{loaded:isLoaded}')
+      .by by
+      .user(v-on:click="searchContents(user)") {{user.displayName}}
+      .grade {{user.grade}}
+      .divideCircle
+      .date {{date}}
 </template>
 
 <script>
+import cacheUser from '../util/cache.user';
+
 export default {
   name: 'list',
   props: {
@@ -26,28 +28,46 @@ export default {
       type: String,
       default: '자바스크립트로 코딩할 때 지켜야 하는 규칙들',
     },
-    userName: {
-      type: String,
-      default: '조성현',
-    },
     date: {
       type: String,
       default: '3달 전',
     },
-    tags: {
-      default: ['javascript', 'html'],
-    },
-    userGrade: {
+    userId: {
       type: String,
-      default: 'student',
+      required: true,
+    },
+    contentId: {
+      type: String,
+      required: true,
+    },
+    tags: {
+      type: Array,
+      default() {
+        return ['javascript', 'html'];
+      },
     },
   },
   data() {
+    return {
+      user: {
+        grade: 'student',
+        displayName: 'student',
+      },
+      isLoaded: false,
+    };
   },
   methods: {
     searchTag(object) {
       console.log(object);
     },
+    changePage() {
+      this.$router.push(`/content/${this.contentId}`);
+    },
+  },
+  async mounted() {
+    const u = await cacheUser.get(this.userId);
+    this.user = u;
+    this.isLoaded = true;
   },
 };
 </script>
@@ -92,8 +112,14 @@ export default {
         color: darkslateblue
         font-weight: 800
   .userSection
+    opacity: 0
     width: auto
     height: 15px
+    transition: opacity .3s, translate .3s
+    transform: translate(0, 10)
+    &.loaded
+      opacity: 1
+      transform: translate(0, 0)
     .by
       font-family: 'Courgette', cursive
       font-size: 13px

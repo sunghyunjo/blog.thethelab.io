@@ -12,6 +12,7 @@ import gnb from './components/gnb';
 import spinner from './components/spinner.simple';
 import eventbus from './eventbus/eventbus';
 
+
 export default {
   name: 'App',
   store,
