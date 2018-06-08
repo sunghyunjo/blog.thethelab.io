@@ -2,8 +2,7 @@
   #app
     spinner(ref="spinner")
     gnb
-    transition(name="slide-fade")
-      router-view
+    router-view
 </template>
 
 <script>
@@ -45,15 +44,19 @@ export default {
 .slide-fade-enter-active {
   transition: all .2s;
 }
+
 .slide-fade-leave-active {
   transition: all .2s;
 }
+
 .slide-fade-enter, .slide-fade-leave-to
-  /* .slide-fade-leave-active below version 2.1.8 */ {
+  /* .slide-fade-leave-active below version 2.1.8 */
+{
   opacity: 0;
 }
 
 body {
+  margin: 0;
   min-height: 600px;
   min-width: 400px;
 }

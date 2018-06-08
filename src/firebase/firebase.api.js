@@ -89,19 +89,31 @@ const content = {
 const auth = (() => {
   const provider = new firebase.auth.GoogleAuthProvider();
   const authEvent = {};
-  const refUser = resource.database.ref('/user');
+  const refUser = resource.firestore.collection('user');
 
   resource.auth.onAuthStateChanged(async (user) => {
+    let serverUser = {};
     if (!_.isNil(user)) {
-      const serverUser = (await refUser.child(`/${user.uid}`).once('value')).val();
-      store.commit('setUser', serverUser);
-    } else {
-      store.commit('setUser', {});
+      serverUser = (await refUser.doc(user.uid).get()).data();
     }
+    store.commit('setUser', serverUser);
     _.forEach(authEvent, (func) => {
-      func(user);
+      func(serverUser);
     });
   });
+
+  async function saveUserToStore(user) {
+    const ref = resource.firestore.collection('user').doc(user.uid);
+    const userData = (await ref.get()).data();
+    store.commit('setUser', userData);
+  }
+
+  async function update(user, body) {
+    const ref = resource.firestore.collection('user').doc(user.uid);
+    await ref.update(body);
+    await saveUserToStore(user);
+  }
+
 
   async function signIn() {
     const result = await resource.auth.signInWithPopup(provider);
@@ -115,7 +127,6 @@ const auth = (() => {
 
     const ref = resource.firestore.collection('user').doc(u.uid);
     const serverUser = await ref.get();
-
 
     if (serverUser.exists) {
       const userData = serverUser.data();
@@ -145,7 +156,6 @@ const auth = (() => {
   }
 
   async function getUser(userId) {
-    console.log('request user', userId);
     const user = await resource.firestore.collection('user').doc(userId).get();
     if (user.exists) return user.data();
     return null;
@@ -155,7 +165,9 @@ const auth = (() => {
     signIn,
     signOut,
     addStateChangeListener,
+    saveUserToStore,
     getUser,
+    update,
   };
 })();
 

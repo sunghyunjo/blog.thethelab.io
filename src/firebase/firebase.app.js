@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import * as firebase from 'firebase';
-import config from './keys/firebase.config';
+import config from '../config/firebase.config';
 
 require('firebase/firestore');
 

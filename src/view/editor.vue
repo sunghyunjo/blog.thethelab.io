@@ -49,6 +49,7 @@ import marked from 'marked';
 import gnb from '../components/gnb';
 import eventBus from '../eventbus/eventbus';
 import { content } from '../firebase/firebase.api';
+import githubApi from '../github/github.api';
 
 export default {
   name: 'editor',
@@ -153,6 +154,7 @@ export default {
     eventBus.offListener(eventBus.Events.editor.Upload);
     eventBus.setListener(eventBus.Events.editor.Upload, async () => {
       const user = this.$store.getters.getUser;
+      const githubUser = this.$store.getters.getGithubUser;
       const data = {
         md: this.mdContents,
         subTitle: this.subTitle,
@@ -160,6 +162,7 @@ export default {
         keyword: this.keywords,
         color: this.selectedColor,
       };
+      await githubApi.createRepoFile(githubUser.name, 'TIL', this.title.md, this.mdContents);
       await content.create(user, this.contentId, data);
       alert('성공적으로 업로드 되었습니다.');
       this.$router.push({ path: `/content/${this.contentId}` });

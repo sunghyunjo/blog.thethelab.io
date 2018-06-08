@@ -8,7 +8,7 @@
     .side-nav(v-bind:class="{ visible : isClicked}")
       .side-nav-cover
         i.material-icons.closeBtn(v-on:click="onSideMenu") close
-        .userSection
+        .user-section
           .user_imgWrapper
             .user_img(v-bind:style="{background: 'url('+ getUserPhotoUrl+')'}")
           .user-name-field
@@ -19,11 +19,28 @@
             .button(v-if='isLogin', v-on:click="onCreateDocument()") 글쓰기
             .button(v-on:click="changeStatus") {{ isLogin ? '로그아웃' : '로그인' }}
             .flex-empty
+        .github-section
+          .connect-github(v-on:click="requestGithubSign", v-if="!getIsUsableGithub")
+            .text
+              i.fab.fa-github
+              | Connect To Github
+          .connected-github
+            .flex-empty
+            i.fab.fa-github
+            .text Github Online
+            .flex-empty
+            i.fa.fa-sync-alt.button
+            //.user hello {{getGithubUser.name}}
+          .til-sync-content(v-on:click="loadTilFromGithub")
+            i.fa.fa-sync-alt
+            .text Sync TIL Contents
         .bottomSection
-          .title - 작성글 목록 -
-          .listWrapper
-            template(v-for="list in contentList")
-              .list(v-on:click="changePage('/content/' + list.contentId)") {{list.title}}
+          .signed-group
+            .title - 작성글 목록 -
+            h4 {{}}
+            .listWrapper
+              template(v-for="list in contentList")
+                .list(v-on:click="changePage('/content/' + list.contentId)") {{list.title}}
 </template>
 
 <script>
@@ -31,6 +48,9 @@ import * as _ from 'lodash';
 import uuid from 'uuid/v1';
 import { auth, content } from '../firebase/firebase.api';
 import eventBus from '../eventbus/eventbus';
+import githubApi from '../github/github.api';
+import util from '../util/util';
+
 
 export default {
   name: 'gnb',
@@ -65,6 +85,12 @@ export default {
       }
       return this.$store.state.user.grade;
     },
+    getIsUsableGithub() {
+      return !_.isNil(this.$store.getters.getGithubUser);
+    },
+    getGithubUser() {
+      return this.$store.getters.getGithubUser;
+    },
     getUserPhotoUrl() {
       if (this.$store.state.user.photoURL === undefined) {
         return 'http://sloangroup.ca/wp-content/uploads/2013/06/user.jpg';
@@ -73,6 +99,9 @@ export default {
     },
   },
   methods: {
+    requestGithubSign() {
+      this.$router.push('/auth/github/sign');
+    },
     onSideMenu() {
       this.isClicked = !this.isClicked;
       return this.isClicked;
@@ -93,10 +122,38 @@ export default {
     onCreateDocument() {
       this.$router.push({ path: `/editor/${uuid()}` });
     },
+    connectToGithub() {
+
+    },
+    async loadTilFromGithub() {
+      const user = this.$store.getters.getUser;
+      const githubUser = this.$store.getters.getGithubUser;
+      const ret = await githubApi.getRepoFiles(githubUser.name, 'TIL');
+      const mds = _.filter(ret.data, d => d.path.endsWith('.md'));
+      const promises = _.map(mds, async (md) => {
+        const mdContent = (await githubApi.getRepoFile(githubUser.name, 'TIL', md.path)).data;
+        return content.create(user, mdContent.sha, {
+          md: util.decode(mdContent.content),
+          keyword: [],
+          title: mdContent.name.replace('.md', ''),
+          subTitle: '',
+          color: { bg: '#a8a8a8', text: '#ffffff', selected: true },
+        });
+      });
+      await Promise.all(promises);
+    },
   },
   mounted() {
     auth.addStateChangeListener('login', async (user) => {
-      console.log(user);
+      if (!_.isNil(user.githubAccessToken)) {
+        githubApi.setToken(user.githubAccessToken);
+        try {
+          const githubUser = await githubApi.getUser();
+          this.$store.commit('setGithubUser', githubUser);
+        } catch (e) {
+          // Auth Failed!!
+        }
+      }
       if (_.isNil(user)) {
         this.isLogin = false;
         this.contentList = [];
@@ -111,6 +168,8 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+@import '../global'
+
 .flex-empty
   flex: 1
 
@@ -156,7 +215,7 @@ export default {
     overflow-x: hidden
     white-space: nowrap
     background: white
-    border-right: solid 1px #ccc
+    border-right: solid 1px rgba(0, 0, 0, 0.2)
     position: fixed
     transition: width .3s, opacity .3s
     opacity: 0
@@ -171,7 +230,9 @@ export default {
         cursor: pointer
         &:hover
           background: #e9e9e9
-      .userSection
+      .side-nav-section
+        width: 100%
+      .user-section
         width: 100%
         height: 250px
         text-align: center
@@ -215,10 +276,83 @@ export default {
           .writeBtn
             &.nonVisible
               display: none
+      .github-section
+        border-top: solid 1px #ddd
+        .til-sync-content
+          cursor: pointer
+          background: #fafafa
+          color: #666
+          position: absolute
+          width: 100%
+          bottom: 1px
+          left: 0
+          justify-content: center
+          align-items: center
+          height: 30px
+          font-size: 14px
+          line-height: 30px
+          display: flex
+          border-top: solid 1px #ddd
+          overflow: hidden
+          transition: background .3s
+          &:hover
+            background: #eee
+            i.fa
+              transform: rotate(180deg)
+              color: $md-blue-500
+          .text
+            width: auto
+            font-weight: 600
+            line-height: inherit
+            padding-left: 8px
+          i.fa
+            transition: transform 0.5s, color .3s
+            transform: rotate(0deg)
+            text-align: center
+        .connect-github, .connected-github
+          font-size: 14px
+          align-content: center
+          color: #666
+          display: flex
+          justify-content: center
+          align-items: center
+          height: 40px
+          line-height: 40px
+          .text
+            width: auto
+            font-weight: 500
+            line-height: inherit
+          i.fa.button
+            width: 40px
+            text-align: center
+            height: 100%
+            border-left: solid 1px #ddd
+            line-height: inherit
+            cursor: pointer
+            transition: background .2s
+            &:hover
+              background: #f0f0f0
+            color: #555
+          i.fab
+            line-height: inherit
+            display: inline-block
+            vertical-align: top
+            width: auto
+            font-size: 20px
+            padding-right: 12px
+        .connected-github
+          color: $md-green-600
+          .user
+            line-height: 20px
+        .connect-github
+          cursor: pointer
+          &:hover
+            background: #fafafa
+            color: #333
+
       .bottomSection
         overflow-y: auto
         overflow-x: hidden
-        height: calc(100vh - 300px)
         white-space: nowrap
         border-top: solid 1px #ddd
         .title
