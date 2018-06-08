@@ -1,6 +1,6 @@
 <template lang="pug">
   .gnbWrapper
-    .gnb
+    .gnb(v-bind:class="setGnbColor")
       i.material-icons.gnb-command.icon(v-on:click="onSideMenu") menu
       .gnb-command.title(v-on:click="changePage('/')") THETHELAB BLOG
       .flex-empty
@@ -54,12 +54,12 @@ import eventBus from '../eventbus/eventbus';
 import githubApi from '../github/github.api';
 import util from '../util/util';
 
-
 export default {
   name: 'gnb',
   data() {
     return {
       isClicked: false,
+      isBlackMode: false,
       visible: {
         visibility: 'visible',
         opacity: 1,
@@ -76,6 +76,13 @@ export default {
     };
   },
   computed: {
+    setGnbColor() {
+      const currentPath = this.$route.path.split('/')[1];
+      if (currentPath === 'settings' || currentPath === 'search') {
+        return 'black';
+      }
+      return 'white';
+    },
     getUserName() {
       if (this.$store.state.user.displayName === undefined) {
         return 'Guest';
@@ -227,6 +234,12 @@ export default {
     width: 100%
     position: fixed
     display: flex
+    &.black
+      .gnb-command
+        color: black
+    &.white
+      .gnb-command
+        color: white
     .gnb-command
       transition: transform .3s
       &.title
@@ -236,7 +249,6 @@ export default {
       cursor: pointer
       height: 100%
       padding: 0 8px
-      color: #fff
       &:hover
         font-weight: 900
       &.icon
