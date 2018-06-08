@@ -22,8 +22,8 @@ const Events = {
 
 export default {
   Events,
-  emit(type) {
-    eventBus.$emit(type);
+  emit(type, d) {
+    eventBus.$emit(type, d);
   },
   setListener(type, callback) {
     eventBus.$on(type, callback);

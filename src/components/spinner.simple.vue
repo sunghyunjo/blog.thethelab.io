@@ -4,7 +4,7 @@
       svg.circular(viewbox='25 25 50 50')
         circle.path(cx='50', cy='50', r='20',
         fill='none', v-bind:stroke-width="strokeWidth + 'px'", stroke-miterlimit='10')
-    .text WT?WT?WT asdf asdf asdf asdf asdfasdf asdf asfd
+    .text {{text}}
 
 </template>
 
@@ -14,6 +14,7 @@ export default {
     return {
       visible: false,
       usage: false,
+      text: '',
     };
   },
   props: {

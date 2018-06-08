@@ -22,9 +22,9 @@
 
 <script>
 import * as _ from 'lodash';
-import marked from 'marked';
 import { content } from '../firebase/firebase.api';
 import eventbus from '../eventbus/eventbus';
+import util from '../util/util';
 
 
 export default {
@@ -64,7 +64,7 @@ export default {
       _.forEach(data, (v, k) => {
         this[k] = v;
       });
-      this.md = marked.parse(`${this.md} `);
+      this.md = util.renderMarkdown(`${this.md} `);
     },
   },
   async mounted() {

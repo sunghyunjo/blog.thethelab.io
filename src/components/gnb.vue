@@ -130,7 +130,6 @@ export default {
     },
     async loadTilFromGithub() {
       eventBus.emit(eventBus.Events.spinner.active);
-
       const user = this.$store.getters.getUser;
       const githubUser = this.$store.getters.getGithubUser;
       const ret = await githubApi.getRepoFiles(githubUser.login, 'TIL');
@@ -139,12 +138,13 @@ export default {
 
       async function getFolderContent(folder) {
         const folderContent = await githubApi.getContent(githubUser.login, 'TIL', folder.path);
-        console.log('load folder ', folder.name, folderContent);
+        eventBus.emit(eventBus.Events.spinner.message, `폴더 ${folder.path} 정보를 읽어오고 있어요.`);
         for (let i = 0; i < folderContent.data.length; i += 1) {
           const d = folderContent.data[i];
           if (d.type === 'dir') {
             await getFolderContent(d);
           } else if (d.name.endsWith('.md')) {
+            eventBus.emit(eventBus.Events.spinner.message, `파일 ${d.name} 를 찾았어요`);
             mds.push(d);
           }
         }
@@ -159,9 +159,9 @@ export default {
         }
       }
 
-
+      eventBus.emit(eventBus.Events.spinner.message, `${mds.length}개의 MD파일을 데이터베이스로 전송중이에요`);
       const promises = _.map(mds, async (md) => {
-        const mdContent = (await githubApi.getContent(githubUser.name, 'TIL', md.path)).data;
+        const mdContent = (await githubApi.getContent(githubUser.login, 'TIL', md.path)).data;
         return content.create(user, mdContent.sha, {
           md: util.decode(mdContent.content),
           keyword: [],
@@ -171,6 +171,8 @@ export default {
         });
       });
       await Promise.all(promises);
+      eventBus.emit(eventBus.Events.spinner.message, `${user.displayName} 님의 글을 로드하고 있어요.`);
+      this.contentList = await content.getUserContent(user.uid);
       eventBus.emit(eventBus.Events.spinner.disable);
     },
   },
@@ -181,6 +183,7 @@ export default {
         githubApi.setToken(user.githubAccessToken);
         try {
           const githubUser = await githubApi.getUser();
+          console.log('githubUser', githubUser);
           this.$store.commit('setGithubUser', githubUser);
         } catch (e) {
           // Auth Failed!!
@@ -228,17 +231,20 @@ export default {
     position: fixed
     display: flex
     .gnb-command
-      transition: transform .3s
+      transition: transform .3s, opacity .3s
       &.title
         padding: 0 !important
         font-size: 16px
         line-height: 50px
+        font-weight: 900
       cursor: pointer
       height: 100%
       padding: 0 8px
       color: #fff
+      opacity: 0.8
       &:hover
         font-weight: 900
+        opacity: 1
       &.icon
         line-height: 50px
         width: 50px

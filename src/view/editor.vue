@@ -36,6 +36,7 @@
             v-bind:class="{ selected : tag.selected}") {{ tag.name }}
       textarea.editor(v-model="mdContents",
       placeholder="md규칙으로 작성된 내용을 입력해주세요.",
+      v-on:keydown.tab.prevent="",
       v-bind:class="{ nonVisible : !isWriteMode }")
       .editor_parsed(v-html="parse",
       v-bind:class="{ nonVisible : isWriteMode }")
@@ -45,11 +46,13 @@
 /* eslint-disable no-param-reassign */
 
 import * as _ from 'lodash';
-import marked from 'marked';
 import gnb from '../components/gnb';
 import eventBus from '../eventbus/eventbus';
 import { content } from '../firebase/firebase.api';
+import util from '../util/util';
 import githubApi from '../github/github.api';
+
+require('highlightjs/styles/default.css');
 
 export default {
   name: 'editor',
@@ -64,7 +67,7 @@ export default {
   },
   computed: {
     parse() {
-      return marked(this.mdContents);
+      return util.renderMarkdown(this.mdContents);
     },
   },
   data() {
@@ -161,10 +164,10 @@ export default {
         keyword: this.keywords,
         color: this.selectedColor,
       };
-      // const githubUser = this.$store.getters.getGithubUser;
-      // if (!_.isEmpty(githubUser)) {
-      //   await githubApi.createRepoFile(githubUser.name, 'TIL', this.title.md, this.mdContents);
-      // }
+      const githubUser = this.$store.getters.getGithubUser;
+      if (!_.isEmpty(githubUser)) {
+        await githubApi.createRepoFile(githubUser.name, 'TIL', this.title.md, this.mdContents);
+      }
       await content.create(user, this.contentId, data);
       alert('성공적으로 업로드 되었습니다.');
       this.$router.push({ path: `/content/${this.contentId}` });
