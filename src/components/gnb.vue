@@ -29,7 +29,7 @@
             i.fab.fa-github
             .text Github Online
             .flex-empty
-            i.fa.fa-sync-alt.button
+            i.fa.fa-sync-alt.button(v-on:click="requestGithubSign")
             //.user hello {{getGithubUser.name}}
           .til-sync-content(v-on:click="loadTilFromGithub")
             i.fa.fa-sync-alt
