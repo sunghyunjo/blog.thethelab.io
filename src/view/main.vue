@@ -14,7 +14,6 @@
               .sub-title {{item.subTitle}}
       .commentWrapper
         .comment(v-html="getBottomText")
-      post-list.postList(v-bind:class="{searched : isSearchMode}")
 </template>
 
 <script>
@@ -68,6 +67,7 @@ export default {
     },
     search() {
       this.isSearchMode = true;
+      this.$router.push('/search');
     },
     getSearchItems: _.debounce(
       async function () {

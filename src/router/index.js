@@ -3,6 +3,8 @@ import Router from 'vue-router';
 import Main from '../view/main';
 import editor from '../view/editor';
 import content from '../view/content';
+import user from '../view/user';
+import search from '../view/search';
 import githubAuthSign from '../view/auth/github.sign';
 import githubAuthRedirect from '../view/auth/github.redirect';
 
@@ -27,6 +29,18 @@ export default new Router({
       name: 'content',
       props: true,
       component: content,
+    },
+    {
+      path: '/user',
+      name: 'user',
+      props: true,
+      component: user,
+    },
+    {
+      path: '/search',
+      name: 'search',
+      props: true,
+      component: search,
     },
     {
       path: '/auth/github/sign',

@@ -37,7 +37,7 @@
         .bottomSection
           .signed-group
             .title - 작성글 목록 -
-            h4 {{}}
+                <!--h4 {{}}-->
             .listWrapper
               template(v-for="list in contentList")
                 .list(v-on:click="changePage('/content/' + list.contentId)") {{list.title}}
