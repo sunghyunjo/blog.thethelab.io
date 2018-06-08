@@ -14,6 +14,7 @@
           .user-name-field
             .user_name {{getUserName}}
             .user_grade {{getUserGrade}}
+          i.material-icons.user-info-editBtn(v-on:click="changePage('/settings')") settings
           .user-commands
             .flex-empty
             .button(v-if='isLogin', v-on:click="onCreateDocument()") 글쓰기
@@ -190,7 +191,10 @@ export default {
         this.contentList = [];
       } else {
         this.isLogin = true;
+        // TODO:: 조그만 spinner로 바꾸기.
+        eventBus.emit(eventBus.Events.spinner.active);
         this.contentList = await content.getUserContent(user.uid);
+        eventBus.emit(eventBus.Events.spinner.disable);
       }
       console.log('로그인상태:', this.isLogin);
     });
@@ -288,6 +292,15 @@ export default {
             width: 100%
             font-size: 14px
             line-height: 18px
+        .user-info-editBtn
+          position: absolute
+          top: 130px
+          right: 80px
+          font-size: 15px
+          color: #bebebe
+          cursor: pointer
+          &:hover
+            color: #0d47a1
         .user-commands
           padding: 20px
           display: flex
