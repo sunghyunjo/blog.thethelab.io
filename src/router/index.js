@@ -5,6 +5,7 @@ import editor from '../view/editor';
 import content from '../view/content';
 import user from '../view/user';
 import search from '../view/search';
+import settings from '../view/settings';
 import githubAuthSign from '../view/auth/github.sign';
 import githubAuthRedirect from '../view/auth/github.redirect';
 
@@ -41,6 +42,12 @@ export default new Router({
       name: 'search',
       props: true,
       component: search,
+    },
+    {
+      path: '/settings',
+      name: 'settings',
+      props: true,
+      component: settings,
     },
     {
       path: '/auth/github/sign',

@@ -1,8 +1,8 @@
 <template lang="pug">
   .mainWrapper
-    .main_gradient(v-bind:class="{searched : isSearchMode}")
-    .main(v-bind:class="{searched : isSearchMode}")
-      .main_mention(v-bind:class="{searched : isSearchMode}" v-html="getMainText").
+    .main_gradient
+    .main
+      .main_mention(v-html="getMainText").
       .searchWrapper
         input.search(type='search', autofocus='true',
         placeholder="관심있는 키워드를 입력하세요.", v-model="keyword")
@@ -49,7 +49,6 @@ export default {
       mention: '오늘 하루도 열심히!',
       time: '1023',
       postNum: '20',
-      isSearchMode: false,
       keyword: '',
       searchItems: [],
       user: this.$store.getters.getUser,
@@ -137,14 +136,6 @@ export default {
     font-family: 'NanumSquare', sans-serif
     @media #{$phone}
       width: 100%
-    &.searched
-      .main_mention
-        opacity: 0
-      .searchWrapper
-        top: 0
-        opacity: 0
-      .commentWrapper
-        opacity: 0
     .main_mention
       transition: opacity .3s, top .3s
       width: 500px
@@ -159,8 +150,6 @@ export default {
       color: white
       opacity: .9
       font-family: 'East Sea Dokdo', cursive
-      &.searched
-        display: none
       @media #{$phone}
         width: 100%
         font-size: 50px
@@ -219,8 +208,6 @@ export default {
 
 .postList
   display: none
-  &.searched
-    display: block
 
 .mdl-button
   border: .5px solid #bebebe
