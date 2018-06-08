@@ -25,6 +25,10 @@ export default {
     window.removeEventListener('scroll', this.scroll);
     eventbus.offListener(eventbus.Events.spinner.active);
     eventbus.offListener(eventbus.Events.spinner.disable);
+    eventbus.offListener(eventbus.Events.spinner.message);
+    eventbus.setListener(eventbus.Events.spinner.message, (message) => {
+      this.$refs.spinner.setMessage(message);
+    });
     eventbus.setListener(eventbus.Events.spinner.active, () => {
       this.$refs.spinner.enable();
     });

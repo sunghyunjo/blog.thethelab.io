@@ -1,9 +1,10 @@
 <template lang="pug">
-  .show-box(v-bind:class="{usage : usage}")
+  .show-box(v-bind:class='{usage:usage}')
     .loader
       svg.circular(viewbox='25 25 50 50')
         circle.path(cx='50', cy='50', r='20',
         fill='none', v-bind:stroke-width="strokeWidth + 'px'", stroke-miterlimit='10')
+    .text WT?WT?WT asdf asdf asdf asdf asdfasdf asdf asfd
 
 </template>
 
@@ -33,9 +34,12 @@ export default {
       }
     },
     enable() {
-      console.log('??');
+      this.text = '';
       this.visible = true;
       this.usage = true;
+    },
+    setMessage(message) {
+      this.text = message;
     },
     disable() {
       this.usage = false;
@@ -52,6 +56,9 @@ export default {
   opacity: 0
   transition: opacity .3s
   pointer-events: none
+  display: flex
+  align-items: center
+  justify-content: center
   &.usage
     opacity: 1
     pointer-events: all
@@ -64,6 +71,8 @@ export default {
   bottom: 0
   left: 0
   right: 0
+  .text
+    padding-top: 180px
   .loader
     position: absolute
     left: calc(50% - 50px)

@@ -19,7 +19,7 @@
             .button(v-if='isLogin', v-on:click="onCreateDocument()") 글쓰기
             .button(v-on:click="changeStatus") {{ isLogin ? '로그아웃' : '로그인' }}
             .flex-empty
-        .github-section(v-if='isLogin')
+        .github-section
           .connect-github(v-on:click="requestGithubSign", v-if="!getIsUsableGithub")
             .text
               i.fab.fa-github
@@ -44,6 +44,8 @@
 </template>
 
 <script>
+/* eslint-disable no-await-in-loop */
+
 import * as _ from 'lodash';
 import uuid from 'uuid/v1';
 import { auth, content } from '../firebase/firebase.api';
@@ -126,12 +128,39 @@ export default {
 
     },
     async loadTilFromGithub() {
+      eventBus.emit(eventBus.Events.spinner.active);
+
       const user = this.$store.getters.getUser;
       const githubUser = this.$store.getters.getGithubUser;
-      const ret = await githubApi.getRepoFiles(githubUser.name, 'TIL');
-      const mds = _.filter(ret.data, d => d.path.endsWith('.md'));
+      const ret = await githubApi.getRepoFiles(githubUser.login, 'TIL');
+      // const mds = _.filter(ret.data, d => d.path.endsWith('.md'));
+      const mds = [];
+
+      async function getFolderContent(folder) {
+        const folderContent = await githubApi.getContent(githubUser.login, 'TIL', folder.path);
+        console.log('load folder ', folder.name, folderContent);
+        for (let i = 0; i < folderContent.data.length; i += 1) {
+          const d = folderContent.data[i];
+          if (d.type === 'dir') {
+            await getFolderContent(d);
+          } else if (d.name.endsWith('.md')) {
+            mds.push(d);
+          }
+        }
+      }
+
+      for (let i = 0; i < ret.data.length; i += 1) {
+        const d = ret.data[i];
+        if (d.type === 'dir') {
+          await getFolderContent(d);
+        } else if (d.name.endsWith('.md')) {
+          mds.push(d);
+        }
+      }
+
+
       const promises = _.map(mds, async (md) => {
-        const mdContent = (await githubApi.getRepoFile(githubUser.name, 'TIL', md.path)).data;
+        const mdContent = (await githubApi.getContent(githubUser.name, 'TIL', md.path)).data;
         return content.create(user, mdContent.sha, {
           md: util.decode(mdContent.content),
           keyword: [],
@@ -141,6 +170,7 @@ export default {
         });
       });
       await Promise.all(promises);
+      eventBus.emit(eventBus.Events.spinner.disable);
     },
   },
   mounted() {

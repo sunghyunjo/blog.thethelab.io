@@ -16,6 +16,7 @@ const Events = {
   spinner: {
     active: 'spinner.active',
     disable: 'spinner.disable',
+    message: 'spinner.message',
   },
 };
 

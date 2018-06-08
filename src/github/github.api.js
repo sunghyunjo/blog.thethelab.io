@@ -17,13 +17,14 @@ export default {
   },
   async getUser() {
     const ret = await client.get('/user');
+    console.log('github user', ret);
     return ret.data;
   },
   async getRepoFiles(user, repo) {
     const ret = await client.get(`/repos/${user}/${repo}/contents/`);
     return ret;
   },
-  async getRepoFile(user, repo, path) {
+  async getContent(user, repo, path) {
     const ret = await client.get(`/repos/${user}/${repo}/contents/${path}`);
     return ret;
   },
