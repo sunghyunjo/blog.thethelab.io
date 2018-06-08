@@ -6,7 +6,7 @@
       .searchWrapper
         input.search(type='search', autofocus='true',
         placeholder="관심있는 키워드를 입력하세요.", v-model="keyword")
-        i.material-icons.searchBtn(v-on:click="search") search
+        i.material-icons.searchBtn(v-on:click="search(keyword)") search
         .searchedItemGroup
           template(v-for="item in searchItems")
             .searchedItem(v-on:click="changePage('/content/'+item.contentId)")
@@ -64,9 +64,13 @@ export default {
     changePage(path) {
       this.$router.push({ path });
     },
-    search() {
+    search(keyword) {
       this.isSearchMode = true;
-      this.$router.push('/search');
+      if (keyword === '') {
+        this.$router.push('/search');
+      } else {
+        this.$router.push(`/search?q=${keyword}`);
+      }
     },
     getSearchItems: _.debounce(
       async function () {
