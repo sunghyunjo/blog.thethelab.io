@@ -17,15 +17,32 @@
 <script>
 export default {
   name: 'list',
+  props: {
+    title: {
+      type: String,
+      default: '자바스크립트로 좋은 코드 만들기',
+    },
+    subTitle: {
+      type: String,
+      default: '자바스크립트로 코딩할 때 지켜야 하는 규칙들',
+    },
+    userName: {
+      type: String,
+      default: '조성현',
+    },
+    date: {
+      type: String,
+      default: '3달 전',
+    },
+    tags: {
+      default: ['javascript', 'html'],
+    },
+    userGrade: {
+      type: String,
+      default: 'student',
+    },
+  },
   data() {
-    return {
-      title: '자바스크립트로 좋은 코드 만들기',
-      subTitle: '자바스크립트로 코딩할 때 지켜야 하는 규칙들',
-      userName: '조성현',
-      date: '3달 전',
-      tags: ['javascript', 'html'],
-      userGrade: 'student',
-    };
   },
   methods: {
     searchTag(object) {
