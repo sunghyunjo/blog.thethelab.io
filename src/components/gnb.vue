@@ -19,7 +19,7 @@
             .button(v-if='isLogin', v-on:click="onCreateDocument()") 글쓰기
             .button(v-on:click="changeStatus") {{ isLogin ? '로그아웃' : '로그인' }}
             .flex-empty
-        .github-section
+        .github-section(v-if='isLogin')
           .connect-github(v-on:click="requestGithubSign", v-if="!getIsUsableGithub")
             .text
               i.fab.fa-github
@@ -37,7 +37,7 @@
         .bottomSection
           .signed-group
             .title - 작성글 목록 -
-                <!--h4 {{}}-->
+              <!--h4 {{}}-->
             .listWrapper
               template(v-for="list in contentList")
                 .list(v-on:click="changePage('/content/' + list.contentId)") {{list.title}}
@@ -145,6 +145,7 @@ export default {
   },
   mounted() {
     auth.addStateChangeListener('login', async (user) => {
+      console.log('gnb', user);
       if (!_.isNil(user.githubAccessToken)) {
         githubApi.setToken(user.githubAccessToken);
         try {
@@ -154,7 +155,7 @@ export default {
           // Auth Failed!!
         }
       }
-      if (_.isNil(user)) {
+      if (_.isNil(user) || _.isEmpty(user)) {
         this.isLogin = false;
         this.contentList = [];
       } else {

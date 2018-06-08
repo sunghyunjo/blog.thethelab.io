@@ -93,7 +93,8 @@ const auth = (() => {
 
   resource.auth.onAuthStateChanged(async (user) => {
     let serverUser = {};
-    if (!_.isNil(user)) {
+    if (!_.isNil(user) && !_.isEmpty(user)) {
+      console.log('authed changed!');
       serverUser = (await refUser.doc(user.uid).get()).data();
     }
     store.commit('setUser', serverUser);

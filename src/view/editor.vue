@@ -154,7 +154,6 @@ export default {
     eventBus.offListener(eventBus.Events.editor.Upload);
     eventBus.setListener(eventBus.Events.editor.Upload, async () => {
       const user = this.$store.getters.getUser;
-      const githubUser = this.$store.getters.getGithubUser;
       const data = {
         md: this.mdContents,
         subTitle: this.subTitle,
@@ -162,7 +161,10 @@ export default {
         keyword: this.keywords,
         color: this.selectedColor,
       };
-      await githubApi.createRepoFile(githubUser.name, 'TIL', this.title.md, this.mdContents);
+      // const githubUser = this.$store.getters.getGithubUser;
+      // if (!_.isEmpty(githubUser)) {
+      //   await githubApi.createRepoFile(githubUser.name, 'TIL', this.title.md, this.mdContents);
+      // }
       await content.create(user, this.contentId, data);
       alert('성공적으로 업로드 되었습니다.');
       this.$router.push({ path: `/content/${this.contentId}` });
@@ -309,7 +311,9 @@ input
           .mdl-button
             margin-left: 8px
             border: .5px solid #bebebe
-            border-radius: 20px
+            padding: 10px 20px
+            display: inline-block
+            border-radius: 25px
     .tagSelection
       width: auto
       height: auto
