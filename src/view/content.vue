@@ -15,7 +15,7 @@
             .tags
               template(v-for="(word, k) in keyword")
                 .tag(v-bind:style="{color: color.text}")
-                  .text {{ '#' + k }}
+                  .text(v-on:click="goToSearchPage(k)") {{ '#' + k }}
     .contentSection
       .content(v-html="md")
 </template>
@@ -67,6 +67,9 @@ export default {
         this[k] = v;
       });
       this.md = util.renderMarkdown(`${this.md} `);
+    },
+    goToSearchPage(q) {
+      this.$router.push(`/search?q=${q}`);
     },
   },
   async mounted() {

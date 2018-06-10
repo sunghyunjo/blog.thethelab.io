@@ -5,6 +5,9 @@
       .gnb-command.title(v-on:click="changePage('/')") THETHELAB BLOG
       .flex-empty
       .gnb-command(v-on:click="upload") UPLOAD
+      .input-group
+        i.material-icons search
+        input(placeholder="search")
     .side-nav(v-bind:class="{ visible : isClicked}")
       .side-nav-cover
         i.material-icons.closeBtn(v-on:click="onSideMenu") close
@@ -72,7 +75,6 @@ export default {
         width: '0',
       },
       contentList: [],
-      mode: 'home',
     };
   },
   computed: {
@@ -238,7 +240,35 @@ export default {
     width: 100%
     position: fixed
     display: flex
+    .input-group
+      position: absolute
+      top: 0
+      left: calc(50% - 140px)
+      i.material-icons
+        position: absolute
+        left: 0
+        top: 0
+        height: 50px
+        width: 40px
+        margin-left: 4px
+        text-align: center
+        line-height: 50px
+        font-size: 20px
+      input
+        &::placeholder
+          font-style: italic
+          color: #777
+        color: #333
+        padding-left: 40px
+        font-size: 16px
+        height: 32px
+        border-radius: 16px
+        outline: none
+        border: solid 1px #ddd
+        width: 280px
     &.black
+      background: #fff
+      border-bottom: solid 1px #eee
       .gnb-command
         color: black
     &.white
