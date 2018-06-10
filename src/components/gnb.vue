@@ -1,6 +1,6 @@
 <template lang="pug">
   .gnbWrapper
-    .gnb
+    .gnb(v-bind:class="setGnbColor")
       i.material-icons.gnb-command.icon(v-on:click="onSideMenu") menu
       .gnb-command.title(v-on:click="changePage('/')") THETHELAB BLOG
       .flex-empty
@@ -20,12 +20,12 @@
             .button(v-if='isLogin', v-on:click="onCreateDocument()") 글쓰기
             .button(v-on:click="changeStatus") {{ isLogin ? '로그아웃' : '로그인' }}
             .flex-empty
-        .github-section
+        .github-section(v-if='isLogin')
           .connect-github(v-on:click="requestGithubSign", v-if="!getIsUsableGithub")
             .text
               i.fab.fa-github
               | Connect To Github
-          .connected-github
+          .connected-github( v-if="getIsUsableGithub")
             .flex-empty
             i.fab.fa-github
             .text Github Online
@@ -37,7 +37,7 @@
             .text Sync TIL Contents
         .bottomSection
           .signed-group
-            .title - 작성글 목록 -
+            .section-name - 작성글 목록 -
               <!--h4 {{}}-->
             .listWrapper
               template(v-for="list in contentList")
@@ -60,6 +60,7 @@ export default {
   data() {
     return {
       isClicked: false,
+      isBlackMode: false,
       visible: {
         visibility: 'visible',
         opacity: 1,
@@ -72,10 +73,16 @@ export default {
       },
       contentList: [],
       mode: 'home',
-      isLogin: false,
     };
   },
   computed: {
+    setGnbColor() {
+      const currentPath = this.$route.path.split('/')[1];
+      if (currentPath === 'settings' || currentPath === 'search') {
+        return 'black';
+      }
+      return 'white';
+    },
     getUserName() {
       if (this.$store.state.user.displayName === undefined) {
         return 'Guest';
@@ -89,10 +96,13 @@ export default {
       return this.$store.state.user.grade;
     },
     getIsUsableGithub() {
-      return !_.isNil(this.$store.getters.getGithubUser);
+      return !_.isEmpty(this.$store.getters.getGithubUser);
     },
     getGithubUser() {
       return this.$store.getters.getGithubUser;
+    },
+    isLogin() {
+      return !_.isEmpty(this.$store.getters.getUser);
     },
     getUserPhotoUrl() {
       if (this.$store.state.user.photoURL === undefined) {
@@ -130,6 +140,7 @@ export default {
     },
     async loadTilFromGithub() {
       eventBus.emit(eventBus.Events.spinner.active);
+
       const user = this.$store.getters.getUser;
       const githubUser = this.$store.getters.getGithubUser;
       const ret = await githubApi.getRepoFiles(githubUser.login, 'TIL');
@@ -138,13 +149,14 @@ export default {
 
       async function getFolderContent(folder) {
         const folderContent = await githubApi.getContent(githubUser.login, 'TIL', folder.path);
-        eventBus.emit(eventBus.Events.spinner.message, `폴더 ${folder.path} 정보를 읽어오고 있어요.`);
+        if (folder.name.indexOf('rx') !== -1) return;
+        eventBus.emit(eventBus.Events.spinner.message, `폴더 <b>${folder.name}</b>를 읽고 있어요.<br>총 ${mds.length}개의 md파일을 읽었어요.`);
+        console.log('load folder ', folder.name, folderContent);
         for (let i = 0; i < folderContent.data.length; i += 1) {
           const d = folderContent.data[i];
           if (d.type === 'dir') {
             await getFolderContent(d);
           } else if (d.name.endsWith('.md')) {
-            eventBus.emit(eventBus.Events.spinner.message, `파일 ${d.name} 를 찾았어요`);
             mds.push(d);
           }
         }
@@ -162,9 +174,10 @@ export default {
       eventBus.emit(eventBus.Events.spinner.message, `${mds.length}개의 MD파일을 데이터베이스로 전송중이에요`);
       const promises = _.map(mds, async (md) => {
         const mdContent = (await githubApi.getContent(githubUser.login, 'TIL', md.path)).data;
+        const keys = mdContent.name.replace('.md', '').toLowerCase();
         return content.create(user, mdContent.sha, {
           md: util.decode(mdContent.content),
-          keyword: [],
+          keyword: keys.split('_'),
           title: mdContent.name.replace('.md', ''),
           subTitle: '',
           color: { bg: '#a8a8a8', text: '#ffffff', selected: true },
@@ -177,29 +190,25 @@ export default {
     },
   },
   mounted() {
-    auth.addStateChangeListener('login', async (user) => {
+    auth.addStateChangeListener('gnb', async (user) => {
       console.log('gnb', user);
+      if (_.isNil(user) || _.isEmpty(user)) {
+        this.contentList = [];
+        return;
+      }
+      eventBus.emit(eventBus.Events.spinner.active);
+      this.contentList = await content.getUserContent(user.uid);
       if (!_.isNil(user.githubAccessToken)) {
         githubApi.setToken(user.githubAccessToken);
         try {
           const githubUser = await githubApi.getUser();
-          console.log('githubUser', githubUser);
           this.$store.commit('setGithubUser', githubUser);
         } catch (e) {
           // Auth Failed!!
         }
       }
-      if (_.isNil(user) || _.isEmpty(user)) {
-        this.isLogin = false;
-        this.contentList = [];
-      } else {
-        this.isLogin = true;
-        // TODO:: 조그만 spinner로 바꾸기.
-        eventBus.emit(eventBus.Events.spinner.active);
-        this.contentList = await content.getUserContent(user.uid);
-        eventBus.emit(eventBus.Events.spinner.disable);
-      }
-      console.log('로그인상태:', this.isLogin);
+      console.log('auth signed : ', user);
+      eventBus.emit(eventBus.Events.spinner.disable);
     });
   },
 };
@@ -230,6 +239,12 @@ export default {
     width: 100%
     position: fixed
     display: flex
+    &.black
+      .gnb-command
+        color: black
+    &.white
+      .gnb-command
+        color: white
     .gnb-command
       transition: transform .3s, opacity .3s
       &.title
@@ -401,19 +416,32 @@ export default {
             color: #333
 
       .bottomSection
+        height: calc(100vh - 350px)
         overflow-y: auto
         overflow-x: hidden
         white-space: nowrap
         border-top: solid 1px #ddd
-        .title
+        .section-name
           font-size: 12px
           font-weight: 500
-        .list, .home
-          height: 40px
-          line-height: 40px
-          cursor: pointer
-          &:hover
-            color: darkslateblue
+        .listWrapper
+          .title
+            font-size: 12px
+            font-weight: 500
+          .list
+            &:first-child
+              border-top: solid 1px #eee
+            text-align: left
+            line-height: 1.4
+            padding: 12px
+            word-break: break-all
+            font-size : 15px
+            white-space: normal
+            border-bottom: solid 1px #eee
+            width: 100%
+            cursor: pointer
+            &:hover
+              background : #f0f0f0
     .home
       line-height: 50px
       height: 50px

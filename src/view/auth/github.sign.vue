@@ -20,6 +20,7 @@
 <script>
 import * as _ from 'lodash';
 import githubConfig from '../../config/github.config';
+import githubApi from '../../github/github.api';
 import { auth } from '../../firebase/firebase.api';
 
 export default {
@@ -44,6 +45,9 @@ export default {
         if (child.closed) {
           user = await auth.getUser(user.uid);
           await auth.saveUserToStore(user);
+          githubApi.setToken(user.githubAccessToken);
+          const githubUser = await githubApi.getUser();
+          this.$store.commit('setGithubUser', githubUser);
           this.emo = '~(^ ^ ~)';
           this.msg = 'Github의 접속 권한을 얻었어요, 이제 Github 기능을 이용 할 수 있습니다.';
           clearInterval(timer);

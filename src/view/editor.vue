@@ -156,6 +156,7 @@ export default {
   created() {
     eventBus.offListener(eventBus.Events.editor.Upload);
     eventBus.setListener(eventBus.Events.editor.Upload, async () => {
+      eventBus.emit(eventBus.Events.spinner.active);
       const user = this.$store.getters.getUser;
       const data = {
         md: this.mdContents,

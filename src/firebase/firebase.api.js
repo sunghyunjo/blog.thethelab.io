@@ -96,6 +96,7 @@ const auth = (() => {
     if (!_.isNil(user) && !_.isEmpty(user)) {
       console.log('authed changed!');
       serverUser = (await refUser.doc(user.uid).get()).data();
+      if (_.isNil(serverUser)) serverUser = {};
     }
     store.commit('setUser', serverUser);
     _.forEach(authEvent, (func) => {
@@ -106,6 +107,7 @@ const auth = (() => {
   async function saveUserToStore(user) {
     const ref = resource.firestore.collection('user').doc(user.uid);
     const userData = (await ref.get()).data();
+    console.log('save store');
     store.commit('setUser', userData);
   }
 

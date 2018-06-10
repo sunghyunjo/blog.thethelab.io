@@ -37,7 +37,9 @@ export default {
   },
   watch: {
     async contentId() {
+      eventbus.emit(eventbus.Events.spinner.active);
       await this.updateScreen();
+      eventbus.emit(eventbus.Events.spinner.disable);
     },
   },
   data() {
@@ -101,8 +103,8 @@ export default {
           text-align: left
           .title
             width: 100%
-            height: 50px
             font-family: 'Nanum Myeongjo', serif
+            word-break: break-all
             font-size: 50px
             padding: 5px 0
           .subTitle
@@ -112,7 +114,6 @@ export default {
             font-size: 15px
             padding: 5px 0
           .tags
-            width: inherit
             font-family: 'Roboto Mono', monospace
             font-size: 15px
             text-align: left
@@ -196,8 +197,15 @@ export default {
     .content
       padding-top: 20px
       width: inherit
-      height: 500px
       font-size: 15px
       text-align: left
       font-family: 'NanumSquare', sans-serif
+      line-height: 1.42
+      tab-size: 2
+      padding-bottom: 64px
+
+.hljs
+  white-space: nowrap
+
+
 </style>
