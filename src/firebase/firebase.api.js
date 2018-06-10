@@ -138,6 +138,7 @@ const auth = (() => {
     }
     _.assign(user, {
       time: new Date().getTime(),
+      tilRepository: 'TIL',
       nickname: '',
       grade: '무지랭이',
       mention: '',

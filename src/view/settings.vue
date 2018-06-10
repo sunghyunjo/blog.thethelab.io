@@ -4,21 +4,22 @@
     .infoSection
       .info
         .info_txt display Name :
-        input(v-model ="getUserName", maxlength="15").info_data
+        input(v-model ="displayName", maxlength="15").info_data
       .info
         .info_txt mention :
-        input(v-model="getMention", maxlength="20").info_data
+        input(v-model="mention", maxlength="20").info_data
       .info
         .info_txt date :
-        input(v-model="getDate", type="date").info_data
+        input(v-model="time", type="date").info_data
       .info
         .info_txt TIL Repository :
-        input(v-model="getGitRepo", type="url").info_data
+        input(v-model="tilRepository", type="url").info_data
       .saveBtn(v-on:click="save") 저장하기
 </template>
 
 <script>
 import { auth } from '../firebase/firebase.api';
+import util from '../util/util';
 
 export default {
   name: 'settings',
@@ -26,7 +27,8 @@ export default {
     return {
       displayName: '',
       mention: '',
-      date: '',
+      time: '',
+      tilRepository: '',
     };
   },
   methods: {
@@ -34,57 +36,19 @@ export default {
       const user = this.$store.getters.getUser;
       const data = {
         displayName: this.displayName,
-        mention: this.getMention,
-        time: this.date,
+        mention: this.mention,
+        time: util.dateToTime(this.time),
       };
+      console.log(data);
       await auth.update(user, data);
     },
   },
-  computed: {
-    getUserName: {
-      get() {
-        return this.$store.getters.getUser.displayName;
-      },
-      set(data) {
-        this.displayName = data;
-      },
-    },
-    getMention: {
-      get() {
-        return this.$store.getters.getUser.mention;
-      },
-      set(data) {
-        this.mention = data;
-      },
-    },
-    getDate: {
-      get() {
-        const date = new Date(this.$store.getters.getUser.time);
-        const year = date.getFullYear();
-        let month = date.getMonth();
-        let day = date.getDate();
-        if (month < 10) {
-          month = `0${month}`;
-        }
-        if (day < 10) {
-          day = `0${day}`;
-        }
-        return `${year}-${month}-${day}`;
-      },
-      set(data) {
-        // eslint-disable-next-line no-param-reassign
-        data = new Date(data).getTime();
-        this.date = data;
-      },
-    },
-    getGitRepo: {
-      get() {
-        // return this.$store.getters.getUser.git;
-      },
-      set(data) {
-        // this.mention = data;
-      },
-    },
+  mounted() {
+    const u = this.$store.getters.getUser;
+    this.displayName = u.displayName;
+    this.mention = u.mention;
+    this.time = util.timeToDate(u.time);
+    this.tilRepository = u.tilRepository;
   },
 };
 </script>

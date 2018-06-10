@@ -174,10 +174,9 @@ export default {
       eventBus.emit(eventBus.Events.spinner.message, `${mds.length}개의 MD파일을 데이터베이스로 전송중이에요`);
       const promises = _.map(mds, async (md) => {
         const mdContent = (await githubApi.getContent(githubUser.login, 'TIL', md.path)).data;
-        const keys = mdContent.name.replace('.md', '').toLowerCase();
         return content.create(user, mdContent.sha, {
           md: util.decode(mdContent.content),
-          keyword: keys.split('_'),
+          keyword: _.map(mdContent.name.replace('.md').match(/[a-z]+/gi), k => k.toLowerCase()),
           title: mdContent.name.replace('.md', ''),
           subTitle: '',
           color: { bg: '#a8a8a8', text: '#ffffff', selected: true },
@@ -435,13 +434,13 @@ export default {
             line-height: 1.4
             padding: 12px
             word-break: break-all
-            font-size : 15px
+            font-size: 15px
             white-space: normal
             border-bottom: solid 1px #eee
             width: 100%
             cursor: pointer
             &:hover
-              background : #f0f0f0
+              background: #f0f0f0
     .home
       line-height: 50px
       height: 50px

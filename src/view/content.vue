@@ -200,12 +200,22 @@ export default {
       font-size: 15px
       text-align: left
       font-family: 'NanumSquare', sans-serif
-      line-height: 1.42
+      line-height: 2
       tab-size: 2
       padding-bottom: 64px
 
+
+</style>
+<style lang="sass">
+.content
+  h1
+    padding-top: 12px
+    line-height: 1.42
+
+img
+  width: 100%
+  height: auto
+
 .hljs
   white-space: nowrap
-
-
 </style>

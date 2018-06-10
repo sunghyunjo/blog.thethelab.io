@@ -31,7 +31,7 @@ export default {
       if (_.isEmpty(this.$store.getters.getUser)) {
         return '더더랩의 기술블로그<br>( ~ . ~ )';
       }
-      return `"${this.$store.getters.getUser.grade}" ${this.$store.getters.getUser.displayName}님<br>오늘도 열심히!`;
+      return `"${this.$store.getters.getUser.grade}" ${this.$store.getters.getUser.displayName}님<br>${this.$store.getters.getUser.mention}`;
     },
     // TODO 시간 undefined 해결하기..
     getBottomText() {
