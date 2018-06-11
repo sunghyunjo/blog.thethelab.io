@@ -1,13 +1,12 @@
 <template lang="pug">
   .editorWrapper
     .titleSection
-      .title_bg(v-bind:style="{background: selectedColor.bg}")
+      .title_bg(v-bind:class="selectedColor.bg")
         .title_txtWrapper
           .bg_colorPicker
             template(v-for="color in colors")
-              .color(v-bind:style="{ background : color.bg }",
-              v-on:click="changeBgColor(color)"
-              v-bind:class="{selectColor : color.selected}")
+              .color(v-on:click="changeBgColor(color)"
+              v-bind:class="[{selectColor : color.selected}, color.bg]")
           .title_txt
             input.title(v-model="title", placeholder="제목을 입력하세요", autofocus='true')
             input.subTitle(placeholder="소제목을 입력하세요", v-model="subTitle")
@@ -15,7 +14,7 @@
             placeholder="키워드", v-on:keyup.13="keywordSubmit")
             .tags
               template(v-for="keyword in keywords")
-                .tag(v-bind:style="{color: selectedColor.text}")
+                .tag(v-bind:class="selectedColor.text")
                   .text {{ '#' + keyword }}
                     .remove-btn(v-on:click="removeKeyword(keyword)")
                       i.material-icons close
@@ -96,17 +95,17 @@ export default {
       isTagMode: false,
       nextMode: '미리보기',
       colors: [
-        { bg: '#888888', text: '#ffffff', selected: true },
-        { bg: '#e7b62f', text: '#7C4108', selected: false },
-        { bg: '#ff908e', text: '#78a7b8', selected: false },
-        { bg: '#215dbe', text: '#905c14', selected: false },
-        { bg: '#009738', text: '#be6c65', selected: false },
-        { bg: '#863c97', text: '#ffffff', selected: false },
-        { bg: '#6ea8a8', text: '#ffffff', selected: false },
+        { bg: 'bgGray', text: 'white', selected: true },
+        { bg: 'bgYellow', text: 'brown', selected: false },
+        { bg: 'bgPink', text: 'skyBlue', selected: false },
+        { bg: 'bgBlue', text: 'lightBrown', selected: false },
+        { bg: 'bgGreen', text: 'deepPink', selected: false },
+        { bg: 'bgPurple', text: 'white', selected: false },
+        { bg: 'bgSky', text: 'white', selected: false },
       ],
       selectedColor: {
-        bg: '#a8a8a8',
-        text: '#ffffff',
+        bg: 'bgGray',
+        text: 'white',
         selected: true,
       },
       subTitle: '',
@@ -246,6 +245,20 @@ input
             border-radius: 50%
             background: red
             transition: transform .1s
+            &.bgGray
+              background: #888888
+            &.bgYellow
+              background: #e7b62f
+            &.bgPink
+              background: #ff908e
+            &.bgBlue
+              background: #215dbe
+            &.bgGreen
+              background: #009738
+            &.bgPurple
+              background: #863c97
+            &.bgSky
+              background: #6ea8a8
             &:hover
               transform: scale(2)
         .title_txt
@@ -255,7 +268,7 @@ input
           background: transparent
           .title
             width: 100%
-            height: 50px
+            height: 60px
             font-family: 'Nanum Myeongjo', serif
             font-size: 50px
             padding: 5px 0
