@@ -63,7 +63,7 @@ export default {
   &.usage
     opacity: 1
     pointer-events: all
-  z-index: 14
+  z-index: 1000
   width: 100%
   background: rgba(255, 255, 255, .85)
   /*border: solid 1px #ccc*/

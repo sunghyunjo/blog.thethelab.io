@@ -20,6 +20,7 @@
 <script>
 import { auth } from '../firebase/firebase.api';
 import util from '../util/util';
+import eventbus from '../eventbus/eventbus';
 
 export default {
   name: 'settings',
@@ -33,14 +34,19 @@ export default {
   },
   methods: {
     async save() {
-      const user = this.$store.getters.getUser;
-      const data = {
-        displayName: this.displayName,
-        mention: this.mention,
-        time: util.dateToTime(this.time),
-      };
-      console.log(data);
-      await auth.update(user, data);
+      eventbus.emit(eventbus.Events.spinner.active);
+      try {
+        const user = this.$store.getters.getUser;
+        const data = {
+          displayName: this.displayName,
+          mention: this.mention,
+          time: util.dateToTime(this.time),
+        };
+        await auth.update(user, data);
+        eventbus.emit(eventbus.Events.spinner.disable);
+      } catch (e) {
+        eventbus.emit(eventbus.Events.spinner.disable);
+      }
     },
   },
   mounted() {

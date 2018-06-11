@@ -27,6 +27,9 @@ export default {
     'post-list': list,
   },
   computed: {
+    getTime() {
+      return new Date().getTime();
+    },
     getMainText() {
       if (_.isEmpty(this.$store.getters.getUser)) {
         return '더더랩의 기술블로그<br>( ~ . ~ )';
@@ -113,7 +116,7 @@ export default {
   width: 100%
   min-height: 680px
   height: 100vh
-  background: url("../assets/image01.jpg") no-repeat center
+  background: url("../assets/image03.jpg") no-repeat center
   background-size: cover
   @media #{$phone}
     height: 100%

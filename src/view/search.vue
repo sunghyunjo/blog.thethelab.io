@@ -1,6 +1,7 @@
 <template lang="pug">
   .searchWrapper
     h1 SearchPage
+    h1
     .postListSection
       template(v-for="content in contentList")
         post-list(:title="content.title", :subTitle="content.subTitle",

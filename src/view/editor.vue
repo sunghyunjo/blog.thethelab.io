@@ -25,10 +25,10 @@
           .buttonWrapper
             .mdl-button.mdl-js-button(v-on:click="onTag",
             v-bind:class="{ selected : isTagMode }") 태그선택
-        .buttonSection
-          .buttonWrapper
-            .mdl-button.mdl-js-button(v-on:click="changeMode") {{isWriteMode ? '미리보기' : '작성하기'}}
-            .mdl-button.mdl-js-button(v-on:click="onDeleteContent") 삭제하기
+      .bottom
+        .buttonWrapper
+          .icon-button.i.material-icons(v-on:click="changeMode") visibility
+          .icon-button.i.material-icons.background-color-red(v-on:click="onDeleteContent") delete
       //.tagSelection(v-bind:class="{ nonVisible : !isTagMode }")
         .tagWrapper
           template(v-for="tag in tags")
@@ -47,8 +47,8 @@
 
 import * as _ from 'lodash';
 import gnb from '../components/gnb';
-import eventBus from '../eventbus/eventbus';
-import { content } from '../firebase/firebase.api';
+import eventbus from '../eventbus/eventbus';
+import { auth, content } from '../firebase/firebase.api';
 import util from '../util/util';
 import githubApi from '../github/github.api';
 
@@ -155,9 +155,9 @@ export default {
     },
   },
   created() {
-    eventBus.offListener(eventBus.Events.editor.Upload);
-    eventBus.setListener(eventBus.Events.editor.Upload, async () => {
-      eventBus.emit(eventBus.Events.spinner.active);
+    eventbus.offListener(eventbus.Events.editor.Upload);
+    eventbus.setListener(eventbus.Events.editor.Upload, async () => {
+      eventbus.emit(eventbus.Events.spinner.active);
       const user = this.$store.getters.getUser;
       const data = {
         md: this.mdContents,
@@ -175,12 +175,27 @@ export default {
       this.$router.push({ path: `/content/${this.contentId}` });
     });
   },
-  mounted() {
+  async mounted() {
+    eventbus.emit(eventbus.Events.spinner.active);
+    try {
+      const ret = await content.get(this.contentId);
+      console.log(ret);
+      this.title = ret.title;
+      this.subTitle = ret.subTitle;
+      this.selectedColor = ret.color;
+      this.keywords = ret.keyword;
+      this.mdContents = ret.md;
+    } catch (e) {
+      console.log('empty content, so create new one');
+    }
+    eventbus.emit(eventbus.Events.spinner.disable);
   },
 };
 </script>
 
 <style lang="sass" scoped>
+@import '../global'
+
 textarea, input
   resize: none
   border: none
@@ -290,6 +305,32 @@ input
     position: relative
     top: 400px
     font-family: 'NanumSquare', sans-serif
+    .bottom
+      right: 0
+      position: fixed
+      bottom: 0
+      .buttonWrapper
+        padding: 24px
+        .icon-button
+          display: block
+          height: 48px
+          line-height: 48px
+          text-align: center
+          width: 48px
+          border-radius: 50%
+          background: $md-grey-100
+          cursor: pointer
+          color: #444
+          margin: 12px 0 8px
+          box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.35)
+          transition: background .3s
+          &:hover
+            background: $md-grey-200
+          &.background-color-red
+            color: #fff
+            background-color: $md-red-600
+            &:hover
+              background-color: $md-red-700
     .top
       position: relative
       height: 50px
@@ -309,16 +350,6 @@ input
         position: absolute
         display: inline-block
         vertical-align: top
-        .buttonWrapper
-          display: inline-block
-          vertical-align: top
-          padding: 0 5px
-          .mdl-button
-            margin-left: 8px
-            border: .5px solid #bebebe
-            padding: 10px 20px
-            display: inline-block
-            border-radius: 25px
     .tagSelection
       width: auto
       height: auto

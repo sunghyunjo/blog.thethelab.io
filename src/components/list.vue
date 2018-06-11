@@ -57,8 +57,8 @@ export default {
     };
   },
   methods: {
-    searchTag(object) {
-      console.log(object);
+    searchContents(tag) {
+      this.$router.push(`/search?q=${tag}`);
     },
     changePage() {
       this.$router.push(`/content/${this.contentId}`);

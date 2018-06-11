@@ -152,7 +152,7 @@ export default {
       async function getFolderContent(folder) {
         const folderContent = await githubApi.getContent(githubUser.login, 'TIL', folder.path);
         if (folder.name.indexOf('rx') !== -1) return;
-        eventBus.emit(eventBus.Events.spinner.message, `폴더 <b>${folder.name}</b>를 읽고 있어요.<br>총 ${mds.length}개의 md파일을 읽었어요.`);
+        eventBus.emit(eventBus.Events.spinner.message, `폴더 <b>${folder.name}</b>를 읽고 있어요.<br>총 <b>${mds.length}개</b>의 md파일을 읽었어요.`);
         console.log('load folder ', folder.name, folderContent);
         for (let i = 0; i < folderContent.data.length; i += 1) {
           const d = folderContent.data[i];
@@ -173,12 +173,12 @@ export default {
         }
       }
 
-      eventBus.emit(eventBus.Events.spinner.message, `${mds.length}개의 MD파일을 데이터베이스로 전송중이에요`);
+      eventBus.emit(eventBus.Events.spinner.message, `<b>${mds.length}개</b>의 MD파일을 데이터베이스로 전송중이에요`);
       const promises = _.map(mds, async (md) => {
         const mdContent = (await githubApi.getContent(githubUser.login, 'TIL', md.path)).data;
         return content.create(user, mdContent.sha, {
           md: util.decode(mdContent.content),
-          keyword: _.map(mdContent.name.replace('.md').match(/[a-z]+/gi), k => k.toLowerCase()),
+          keyword: _.map(mdContent.name.replace('.md', '').match(/[a-z]+/gi), k => k.toLowerCase()),
           title: mdContent.name.replace('.md', ''),
           subTitle: '',
           color: { bg: '#a8a8a8', text: '#ffffff', selected: true },
@@ -445,7 +445,7 @@ export default {
             color: #333
 
       .bottomSection
-        height: calc(100vh - 350px)
+        height: calc(100vh - 320px)
         overflow-y: auto
         overflow-x: hidden
         white-space: nowrap
