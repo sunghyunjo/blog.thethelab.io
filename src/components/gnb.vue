@@ -4,8 +4,8 @@
       i.material-icons.gnb-command.icon(v-on:click="onSideMenu") menu
       .gnb-command.title(v-on:click="changePage('/')") THETHELAB BLOG
       .flex-empty
-      .gnb-command(v-on:click="upload") UPLOAD
-      .input-group
+      .gnb-command(v-bind:class="showUploadBtn", v-on:click="upload") UPLOAD
+      .input-group(v-bind:class="changeSearchBarMode")
         i.material-icons search
         input(placeholder="search")
     .side-nav(v-bind:class="{ visible : isClicked}")
@@ -41,7 +41,6 @@
         .bottomSection
           .signed-group
             .section-name - 작성글 목록 -
-              <!--h4 {{}}-->
             .listWrapper
               template(v-for="list in contentList")
                 .list(v-on:click="changePage('/content/' + list.contentId)") {{list.title}}
@@ -84,6 +83,20 @@ export default {
         return 'black';
       }
       return 'white';
+    },
+    changeSearchBarMode() {
+      const currentPath = this.$route.path.split('/')[1];
+      if (currentPath === '' || currentPath === 'editor') {
+        return 'hide';
+      }
+      return '';
+    },
+    showUploadBtn() {
+      const currentPath = this.$route.path.split('/')[1];
+      if (currentPath !== 'editor') {
+        return 'hide';
+      }
+      return '';
     },
     getUserName() {
       if (this.$store.state.user.displayName === undefined) {
@@ -244,6 +257,8 @@ export default {
       position: absolute
       top: 0
       left: calc(50% - 140px)
+      &.hide
+        display: none
       i.material-icons
         position: absolute
         left: 0
@@ -276,6 +291,8 @@ export default {
         color: white
     .gnb-command
       transition: transform .3s, opacity .3s
+      &.hide
+        display: none
       &.title
         padding: 0 !important
         font-size: 16px
