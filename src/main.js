@@ -8,7 +8,7 @@ import router from './router';
 Vue.config.productionTip = false;
 
 Vue.use(Toasted, {
-  position: 'bottom-left',
+  position: 'bottom-center',
   duration: '5000',
   className: 'toast-style',
 });
