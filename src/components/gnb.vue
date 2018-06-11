@@ -16,8 +16,8 @@
             .user_img(v-bind:style="{background: 'url('+ getUserPhotoUrl+')'}")
           .user-name-field
             .user_name {{getUserName}}
+              i.material-icons.user-info-editBtn(v-on:click="changePage('/settings')") settings
             .user_grade {{getUserGrade}}
-          i.material-icons.user-info-editBtn(v-on:click="changePage('/settings')") settings
           .user-commands
             .flex-empty
             .button(v-if='isLogin', v-on:click="onCreateDocument()") 글쓰기
@@ -355,19 +355,18 @@ export default {
             width: 100%
             font-size: 18px
             line-height: 28px
+            padding-left: 10px
+            .user-info-editBtn
+              padding-left: 5px
+              font-size: 12px
+              color: #bebebe
+              cursor: pointer
+              &:hover
+                color: #0d47a1
           .user_grade
             width: 100%
             font-size: 14px
             line-height: 18px
-        .user-info-editBtn
-          position: absolute
-          top: 130px
-          right: 80px
-          font-size: 15px
-          color: #bebebe
-          cursor: pointer
-          &:hover
-            color: #0d47a1
         .user-commands
           padding: 20px
           display: flex
