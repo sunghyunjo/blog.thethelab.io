@@ -10,8 +10,6 @@
               .by by
               .user(v-on:click="searchContents(user)") {{userName}}
               .grade {{userGrade}}
-              .divideCircle
-              .date {{}}
             .tags
               template(v-for="(word, k) in keyword")
                 .tag(v-bind:style="{color: color.text}")
