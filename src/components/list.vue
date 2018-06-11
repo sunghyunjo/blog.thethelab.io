@@ -10,8 +10,6 @@
       .by by
       .user(v-on:click="searchContents(user)") {{user.displayName}}
       .grade {{user.grade}}
-      .divideCircle
-      .date {{date}}
 </template>
 
 <script>
@@ -136,21 +134,9 @@ export default {
         color: darkslateblue
         font-weight: 800
     .grade
+      padding-top: 3px
       font-size: 10px
       display: inline-block
       vertical-align: top
       padding-left: 5px
-    .divideCircle
-      width: 2px
-      height: 2px
-      display: inline-block
-      vertical-align: center
-      border-radius: 50%
-      background: black
-      margin: 4px
-    .date
-      display: inline-block
-      vertical-align: top
-      font-size: 10px
-      color: gray
 </style>

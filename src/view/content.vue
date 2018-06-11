@@ -1,7 +1,7 @@
 <template lang="pug">
   .contentsWrapper
     .titleSection
-      .title_bg(v-bind:style="{background: color.bg, color: color.text}")
+      .title_bg(v-bind:class="[color.bg, color.text]")
         .title_txtWrapper
           .title_txt
             .title {{ title }}
@@ -10,8 +10,6 @@
               .by by
               .user(v-on:click="searchContents(user)") {{userName}}
               .grade {{userGrade}}
-              .divideCircle
-              .date {{}}
             .tags
               template(v-for="(word, k) in keyword")
                 .tag(v-bind:style="{color: color.text}")
@@ -60,8 +58,8 @@ export default {
       keyword: [{ key: true }],
       userGrade: 'student',
       color: {
-        bg: '#a8a8a8',
-        text: '#ffffff',
+        bg: 'bgGray',
+        text: 'white',
       },
       md: '',
       authorUid: '',
@@ -129,7 +127,6 @@ export default {
     .title_bg
       width: 100%
       height: inherit
-      background: #f0f
       .title_txtWrapper
         width: 700px
         height: auto

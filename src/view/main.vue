@@ -79,7 +79,6 @@ export default {
         this.searchItems = await content.find(this.keyword.split(' '));
       }, 500),
   },
-
 };
 </script>
 

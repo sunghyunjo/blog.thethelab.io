@@ -4,7 +4,7 @@
       i.material-icons.gnb-command.icon(v-on:click="onSideMenu") menu
       .gnb-command.title(v-on:click="changePage('/')") THETHELAB BLOG
       .flex-empty
-      .gnb-command(v-bind:class="showUploadBtn", v-on:click="upload") UPLOAD
+      .gnb-command(v-bind:class="hideBtn", v-on:click="upload") UPLOAD
       .input-group(v-bind:class="changeSearchBarMode")
         i.material-icons search
         input(placeholder="search")
@@ -91,7 +91,7 @@ export default {
       }
       return '';
     },
-    showUploadBtn() {
+    hideBtn() {
       const currentPath = this.$route.path.split('/')[1];
       if (currentPath !== 'editor') {
         return 'hide';
