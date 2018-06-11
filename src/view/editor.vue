@@ -135,7 +135,15 @@ export default {
       return this.isTagMode;
     },
     async onDeleteContent() {
-      const ret = await content.delete(this.$store.getters.getUser, this.contentId);
+      eventbus.emit(eventbus.Events.spinner.active);
+      eventbus.emit(eventbus.Events.spinner.message, `<b>${this.title}</b> 를 삭제하고 있습니다.`);
+      try {
+        await content.delete(this.$store.getters.getUser, this.contentId);
+        this.$router.push('/');
+      } catch (e) {
+        console.error(e);
+      }
+      eventbus.emit(eventbus.Events.spinner.disable);
     },
     changeTagSelectMode(tag) {
       tag.selected = !tag.selected;
@@ -166,10 +174,10 @@ export default {
         keyword: this.keywords,
         color: this.selectedColor,
       };
-      const githubUser = this.$store.getters.getGithubUser;
-      if (!_.isEmpty(githubUser)) {
-        await githubApi.createRepoFile(githubUser.name, 'TIL', this.title.md, this.mdContents);
-      }
+      // const githubUser = this.$store.getters.getGithubUser;
+      // if (!_.isEmpty(githubUser)) {
+      //   await githubApi.createRepoFile(githubUser.name, 'TIL', this.title.md, this.mdContents);
+      // }
       await content.create(user, this.contentId, data);
       alert('성공적으로 업로드 되었습니다.');
       this.$router.push({ path: `/content/${this.contentId}` });
