@@ -140,6 +140,7 @@ export default {
       try {
         await content.delete(this.$store.getters.getUser, this.contentId);
         this.$router.push('/');
+        this.$toasted.show(`컨텐츠 ${this.title}가 삭제 되었습니다.`);
       } catch (e) {
         console.error(e);
       }
@@ -179,7 +180,7 @@ export default {
       //   await githubApi.createRepoFile(githubUser.name, 'TIL', this.title.md, this.mdContents);
       // }
       await content.create(user, this.contentId, data);
-      alert('성공적으로 업로드 되었습니다.');
+      this.$toasted.show(`컨텐츠 ${this.title}이 성공적으로 업로드 되었습니다.`);
       this.$router.push({ path: `/content/${this.contentId}` });
     });
   },
@@ -187,7 +188,6 @@ export default {
     eventbus.emit(eventbus.Events.spinner.active);
     try {
       const ret = await content.get(this.contentId);
-      console.log(ret);
       this.title = ret.title;
       this.subTitle = ret.subTitle;
       this.selectedColor = ret.color;

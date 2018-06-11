@@ -44,52 +44,34 @@ export default {
 };
 </script>
 
-<style>
+<style lang="sass">
 
-.slide-fade-enter-active {
-  transition: all .2s;
-}
+.slide-fade-enter-active
+  transition: all .2s
 
-.slide-fade-leave-active {
-  transition: all .2s;
-}
+.slide-fade-leave-active
+  transition: all .2s
 
 .slide-fade-enter, .slide-fade-leave-to
-  /* .slide-fade-leave-active below version 2.1.8 */
-{
-  opacity: 0;
-}
+  opacity: 0
 
-body {
-  margin: 0;
-  min-height: 600px;
-  min-width: 400px;
-}
+body
+  margin: 0
+  min-height: 600px
+  min-width: 400px
 
-/**::-webkit-scrollbar-track {*/
-/*background-color: rgba(255, 255, 255, 0);*/
-/*width : 6px;*/
-/*}*/
+#app
+  font-family: 'Avenir', Helvetica, Arial, sans-serif
+  /*font-family: 'NanumSquare', sans-serif;*
+  -webkit-font-smoothing: antialiased
+  -moz-osx-font-smoothing: grayscale
+  text-align: center
+  color: #2c3e50
+  margin: 0
+  padding: 0
+  box-sizing: border-box
 
-/**::-webkit-scrollbar {*/
-/*width: 10px;*/
-/*background: rgba(255, 255, 255, 0);*/
-/*}*/
+.toast-style
+  font-family: 'NanumSquare', sans-serif
 
-/**::-webkit-scrollbar-thumb {*/
-/*border-radius: 3px;*/
-/*background-color: #333;*/
-/*}*/
-
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  /*font-family: 'NanumSquare', sans-serif;*/
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
 </style>
