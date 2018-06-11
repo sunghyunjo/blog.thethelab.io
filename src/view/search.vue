@@ -1,7 +1,5 @@
 <template lang="pug">
   .searchWrapper
-    h1 SearchPage
-    h1
     .postListSection
       template(v-for="content in contentList")
         post-list(:title="content.title", :subTitle="content.subTitle",
@@ -43,6 +41,7 @@ export default {
   width: 100%
   height: auto
   .postListSection
+    padding-top: 50px
     width: 700px
     margin: auto
     height: auto
