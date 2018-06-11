@@ -8,7 +8,7 @@
         .tag(v-on:click="searchContents(tag)") {{'#'+tag}}
     .userSection(v-bind:class='{loaded:isLoaded}')
       .by by
-      .user(v-on:click="searchContents(user)") {{user.displayName}}
+      .user(v-on:click="goToUserPage(user)") {{user.displayName}}
       .grade {{user.grade}}
 </template>
 
@@ -60,6 +60,9 @@ export default {
     },
     changePage() {
       this.$router.push(`/content/${this.contentId}`);
+    },
+    goToUserPage() {
+      this.$router.push(`/user/${this.userId}`);
     },
   },
   async mounted() {

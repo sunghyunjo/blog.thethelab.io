@@ -8,7 +8,7 @@
             .subTitle {{ subTitle}}
             .userSection
               .by by
-              .user(v-on:click="searchContents(user)") {{userName}}
+              .user(v-on:click="goToUserPage(user)") {{userName}}
               .grade {{userGrade}}
             .tags
               template(v-for="(word, k) in keyword")
@@ -80,6 +80,9 @@ export default {
     },
     goToEditPage() {
       this.$router.push(`/editor/${this.contentId}`);
+    },
+    goToUserPage() {
+      this.$router.push(`/user/${this.userId}`);
     },
   },
   async mounted() {

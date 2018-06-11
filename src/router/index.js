@@ -32,7 +32,7 @@ export default new Router({
       component: content,
     },
     {
-      path: '/user',
+      path: '/user/:userId',
       name: 'user',
       props: true,
       component: user,
