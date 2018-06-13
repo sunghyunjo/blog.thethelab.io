@@ -20,6 +20,7 @@
 import * as _ from 'lodash';
 import list from '../components/list';
 import { content } from '../firebase/firebase.api';
+import util from '../util/util';
 
 export default {
   name: 'Main',
@@ -36,13 +37,13 @@ export default {
       }
       return `"${this.$store.getters.getUser.grade}" ${this.$store.getters.getUser.displayName}님<br>${this.$store.getters.getUser.mention}`;
     },
-    // TODO 시간 undefined 해결하기..
+
     getBottomText() {
       if (_.isEmpty(this.$store.getters.getUser)) return '';
       const creationTime = this.$store.getters.getUser.time;
       const currentTime = new Date().getTime();
-      const diffTime = (currentTime - creationTime) / 60000;
-      return `${this.$store.getters.getUser.displayName}님은 THETHELAB과 함께 ${diffTime}분을 보냈습니다.`;
+      const diffTime = Math.floor((currentTime - creationTime) / 86400000);
+      return `${this.$store.getters.getUser.displayName}님은 THETHELAB과 함께 ${diffTime}일을 보냈습니다.`;
     },
   },
   data() {
