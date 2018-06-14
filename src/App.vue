@@ -1,28 +1,43 @@
 <template lang="pug">
-  #app
+  #app(v-scroll="handleScroll")
     spinner(ref="spinner")
     gnb
     router-view
 </template>
 
 <script>
+/* eslint-disable object-shorthand */
 
+import Vue from 'vue';
 import { store } from './vuex/store';
 import gnb from './components/gnb';
 import spinner from './components/spinner.simple';
 import eventbus from './eventbus/eventbus';
 
+Vue.directive('scroll', {
+  inserted(el, binding) {
+    const f = function (evt) {
+      if (binding.value(evt, el)) {
+        window.removeEventListener('scroll', f);
+      }
+    };
+    window.addEventListener('scroll', f);
+  },
+});
 
 export default {
   name: 'App',
   store,
-  methods: {},
+  methods: {
+    handleScroll() {
+      eventbus.emit(eventbus.Events.gnb.scroll, window.scrollY);
+    },
+  },
   components: {
     gnb,
     spinner,
   },
   created() {
-    window.removeEventListener('scroll', this.scroll);
     eventbus.offListener(eventbus.Events.spinner.active);
     eventbus.offListener(eventbus.Events.spinner.disable);
     eventbus.offListener(eventbus.Events.spinner.message);
@@ -35,11 +50,6 @@ export default {
     eventbus.setListener(eventbus.Events.spinner.disable, () => {
       this.$refs.spinner.disable();
     });
-  },
-  method: {
-    scroll() {
-      console.log('event');
-    },
   },
 };
 </script>

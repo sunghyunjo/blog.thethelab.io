@@ -18,6 +18,9 @@ const Events = {
     disable: 'spinner.disable',
     message: 'spinner.message',
   },
+  gnb: {
+    scroll: 'gnb.scroll',
+  },
 };
 
 export default {

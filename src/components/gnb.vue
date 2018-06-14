@@ -1,5 +1,5 @@
 <template lang="pug">
-  .gnbWrapper
+  .gnbWrapper(v-bind:class="getScroll")
     .gnb(v-bind:class="setGnbColor")
       i.material-icons.gnb-command.icon(v-on:click="onSideMenu") menu
       .gnb-command.title(v-on:click="changePage('/')") THETHELAB BLOG
@@ -74,9 +74,14 @@ export default {
         width: '0',
       },
       contentList: [],
+      scrollY: 0,
     };
   },
   computed: {
+    getScroll() {
+      if (this.scrollY > 50) return 'scrolled';
+      return '';
+    },
     setGnbColor() {
       const currentPath = this.$route.path.split('/')[1];
       if (currentPath === 'settings' || currentPath === 'search') {
@@ -203,6 +208,11 @@ export default {
       eventBus.emit(eventBus.Events.spinner.disable);
     },
   },
+  created() {
+    eventBus.setListener(eventBus.Events.gnb.scroll, (scrollY) => {
+      this.scrollY = scrollY;
+    });
+  },
   mounted() {
     auth.addStateChangeListener('gnb', async (user) => {
       console.log('gnb', user);
@@ -249,6 +259,12 @@ export default {
   height: 50px
   background: transparent
   line-height: 50px
+  &.scrolled
+    .gnb
+      background: #fff
+      border-bottom: solid 1px #eee
+      .gnb-command
+        color: black !important
   .gnb
     width: 100%
     position: fixed
