@@ -257,11 +257,11 @@ export default {
   z-index: 100
   width: 100vw
   height: 50px
-  background: transparent
+  background: rgba(255,255,255,0)
   line-height: 50px
   &.scrolled
     .gnb
-      background: #fff
+      background: rgba(255,255,255,1)
       border-bottom: solid 1px #eee
       .gnb-command
         color: black !important
@@ -269,6 +269,7 @@ export default {
     width: 100%
     position: fixed
     display: flex
+    transition: background .1s
     .input-group
       position: absolute
       top: 0
