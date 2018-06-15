@@ -1,7 +1,7 @@
 <template lang="pug">
   .contentsWrapper
     .titleSection
-      .title_bg(v-bind:class="[color.bg, color.text]")
+      .title_bg(v-bind:class="color")
         .title_txtWrapper
           .title_txt
             .title {{ title }}
@@ -21,7 +21,7 @@
 
 <script>
 import * as _ from 'lodash';
-import { content } from '../firebase/firebase.api';
+import { auth, content } from '../firebase/firebase.api';
 import eventbus from '../eventbus/eventbus';
 import util from '../util/util';
 
@@ -57,10 +57,7 @@ export default {
       },
       keyword: [{ key: true }],
       userGrade: 'student',
-      color: {
-        bg: 'bgGray',
-        text: 'white',
-      },
+      color: 'bgGray',
       md: '',
       authorUid: '',
     };
@@ -68,7 +65,10 @@ export default {
   methods: {
     async updateScreen() {
       const data = await content.get(this.contentId);
-      console.log(data);
+      const user = await auth.getUser(data.userId);
+      this.color = data.color;
+      this.userName = user.displayName;
+      this.userGrade = user.grade;
       _.forEach(data, (v, k) => {
         this[k] = v;
       });
@@ -205,9 +205,9 @@ export default {
             vertical-align: top
             padding-left: 5px
             cursor: pointer
+            font-weight: 800
             &:hover
-              color: darkslateblue
-              font-weight: 800
+              text-decoration: underline
           .grade
             font-size: 10px
             display: inline-block
@@ -243,7 +243,33 @@ export default {
       tab-size: 2
       padding-bottom: 64px
 
+.bgGray
+  background: #888888
+  color: white
 
+.bgYellow
+  background: #e7b62f
+  color: brown
+
+.bgPink
+  background: #ff908e
+  color: skyblue
+
+.bgBlue
+  background: #215dbe
+  color: rosybrown
+
+.bgGreen
+  background: #009738
+  color: deepPink
+
+.bgPurple
+  background: #863c97
+  color: white
+
+.bgSky
+  background: #6ea8a8
+  color: white
 </style>
 <style lang="sass">
 .content

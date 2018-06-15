@@ -25,13 +25,20 @@ export default {
     return ret;
   },
   async getContent(user, repo, path) {
-    const ret = await client.get(`/repos/${user}/${repo}/contents/${path}`);
+    const ret = await client.get(`/repos/${user}/${repo}/contents/${path}.md`);
     return ret;
+  },
+  async deleteRepoFile(user, repo, path, sha) {
+    const ret = await client.delete(`/repos/${user}/${repo}/contents/${path}.md`, {
+      message: `created at \`${new Date().toLocaleTimeString()}, from http://blog.thethelab.io`,
+      sha,
+    });
+    console.log(ret);
   },
   async createRepoFile(user, repo, path, content) {
     const blob = util.encode(content);
-    const ret = await client.put(`/repos/${user}/${repo}/contents/${path}`, {
-      message: '',
+    const ret = await client.put(`/repos/${user}/${repo}/contents/${path}.md`, {
+      message: `created at \`${new Date().toLocaleTimeString()}, from http://blog.thethelab.io`,
       content: blob,
       sha: sha1(blob),
     });

@@ -100,6 +100,7 @@ export default {
           font-size: 14px
   .postSection
     width: 700px
+    padding: 48px 0
     height: auto
     margin: auto
 </style>

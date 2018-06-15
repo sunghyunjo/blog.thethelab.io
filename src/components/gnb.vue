@@ -146,11 +146,17 @@ export default {
       this.$router.push({ path });
     },
     async changeStatus() {
-      if (this.isLogin) {
-        await auth.signOut();
-      } else {
-        await auth.signIn();
+      eventBus.emit(eventBus.Events.spinner.active);
+      try {
+        if (this.isLogin) {
+          await auth.signOut();
+        } else {
+          await auth.signIn();
+        }
+      } catch (e) {
+        console.error(e);
       }
+      eventBus.emit(eventBus.Events.spinner.disable);
     },
     onCreateDocument() {
       this.$router.push({ path: `/editor/${uuid()}` });
@@ -192,14 +198,17 @@ export default {
       }
 
       eventBus.emit(eventBus.Events.spinner.message, `<b>${mds.length}개</b>의 MD파일을 데이터베이스로 전송중이에요`);
+      const colors = ['bgGray', 'bgYellow', 'bgPink', 'bgBlue', 'bgGreen', 'bgPurple', 'bgSky'];
       const promises = _.map(mds, async (md) => {
         const mdContent = (await githubApi.getContent(githubUser.login, 'TIL', md.path)).data;
+        const idx = Math.floor(Math.random() * colors.length);
+        console.log(colors, idx);
         return content.create(user, mdContent.sha, {
           md: util.decode(mdContent.content),
           keyword: _.map(mdContent.name.replace('.md', '').match(/[a-z]+/gi), k => k.toLowerCase()),
           title: mdContent.name.replace('.md', ''),
           subTitle: '',
-          color: { bg: '#a8a8a8', text: '#ffffff', selected: true },
+          color: colors[idx],
         });
       });
       await Promise.all(promises);
@@ -214,9 +223,11 @@ export default {
     });
   },
   mounted() {
+    eventBus.emit(eventBus.Events.spinner.active);
     auth.addStateChangeListener('gnb', async (user) => {
-      console.log('gnb', user);
+      console.log('gnb', user, 'is empty : ', _.isEmpty(user));
       if (_.isNil(user) || _.isEmpty(user)) {
+        eventBus.emit(eventBus.Events.spinner.disable);
         this.contentList = [];
         return;
       }
@@ -231,7 +242,6 @@ export default {
           // Auth Failed!!
         }
       }
-      console.log('auth signed : ', user);
       eventBus.emit(eventBus.Events.spinner.disable);
     });
   },
@@ -257,11 +267,11 @@ export default {
   z-index: 100
   width: 100vw
   height: 50px
-  background: rgba(255,255,255,0)
+  background: rgba(255, 255, 255, 0)
   line-height: 50px
   &.scrolled
     .gnb
-      background: rgba(255,255,255,1)
+      background: rgba(255, 255, 255, 1)
       border-bottom: solid 1px #eee
       .gnb-command
         color: black !important

@@ -1,20 +1,18 @@
 <template lang="pug">
   .editorWrapper
     .titleSection
-      .title_bg(v-bind:class="selectedColor.bg")
+      .title_bg(v-bind:class="selectedColor")
         .title_txtWrapper
           .bg_colorPicker
             template(v-for="color in colors")
-              .color(v-on:click="changeBgColor(color)"
-              v-bind:class="[{selectColor : color.selected}, color.bg]")
+              .color(v-on:click="changeBgColor(color)", v-bind:class="color")
           .title_txt
             input.title(v-model="title", placeholder="제목을 입력하세요", autofocus='true')
             input.subTitle(placeholder="소제목을 입력하세요", v-model="subTitle")
-            input.subTitle(v-model="keywordModel",
-            placeholder="키워드", v-on:keyup.13="keywordSubmit")
+            input.subTitle(v-model="keywordModel", placeholder="키워드", v-on:keyup.13="keywordSubmit", v-on:keyup.32="keywordSubmit")
             .tags
               template(v-for="keyword in keywords")
-                .tag(v-bind:class="selectedColor.text")
+                .tag(v-bind:class="selectedColor")
                   .text {{ '#' + keyword }}
                     .remove-btn(v-on:click="removeKeyword(keyword)")
                       i.material-icons close
@@ -26,6 +24,8 @@
             v-bind:class="{ selected : isTagMode }") 태그선택
       .bottom
         .buttonWrapper
+          i.icon-button.fab.fa-github
+          .icon-button.i.material-icons(v-on:click="downloadFile") cloud_download
           .icon-button.i.material-icons(v-on:click="changeMode") visibility
           .icon-button.i.material-icons.background-color-red(v-on:click="onDeleteContent") delete
       //.tagSelection(v-bind:class="{ nonVisible : !isTagMode }")
@@ -45,11 +45,13 @@
 /* eslint-disable no-param-reassign */
 
 import * as _ from 'lodash';
+import path from 'path';
 import gnb from '../components/gnb';
 import eventbus from '../eventbus/eventbus';
 import { auth, content } from '../firebase/firebase.api';
 import util from '../util/util';
 import githubApi from '../github/github.api';
+
 
 require('highlightjs/styles/default.css');
 
@@ -95,19 +97,15 @@ export default {
       isTagMode: false,
       nextMode: '미리보기',
       colors: [
-        { bg: 'bgGray', text: 'white', selected: true },
-        { bg: 'bgYellow', text: 'brown', selected: false },
-        { bg: 'bgPink', text: 'skyBlue', selected: false },
-        { bg: 'bgBlue', text: 'lightBrown', selected: false },
-        { bg: 'bgGreen', text: 'deepPink', selected: false },
-        { bg: 'bgPurple', text: 'white', selected: false },
-        { bg: 'bgSky', text: 'white', selected: false },
+        'bgGray',
+        'bgYellow',
+        'bgPink',
+        'bgBlue',
+        'bgGreen',
+        'bgPurple',
+        'bgSky',
       ],
-      selectedColor: {
-        bg: 'bgGray',
-        text: 'white',
-        selected: true,
-      },
+      selectedColor: 'bgGray',
       subTitle: '',
       title: '',
       keywordModel: '',
@@ -116,6 +114,7 @@ export default {
   },
   methods: {
     keywordSubmit() {
+      console.log(this.keywords, 'keyword');
       if (this.keywords.length > 6) return;
       const keyword = this.keywordModel.replace(/ /gi, '');
       if (_.isEmpty(keyword)) return;
@@ -149,16 +148,22 @@ export default {
       tag.selected = !tag.selected;
       this.$store.commit('setTag', this.tags);
     },
+    downloadFile() {
+      var element = document.createElement('a');
+      element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(this.mdContents)}`);
+      element.setAttribute('download', `${this.title}.md`);
+
+      element.style.display = 'none';
+      document.body.appendChild(element);
+
+      element.click();
+
+      document.body.removeChild(element)
+    },
     getSelectedTags() {
       return _.filter(this.tags, tag => tag.selected);
     },
     changeBgColor(color) {
-      _.forEach(this.colors, (c) => {
-        if (c.selected) {
-          c.selected = false;
-        }
-      });
-      color.selected = true;
       this.selectedColor = color;
     },
   },
@@ -176,7 +181,9 @@ export default {
       };
       // const githubUser = this.$store.getters.getGithubUser;
       // if (!_.isEmpty(githubUser)) {
-      //   await githubApi.createRepoFile(githubUser.name, 'TIL', this.title.md, this.mdContents);
+      //   let pathJoined = path.join(this.githubPath, this.title);
+      //   if (pathJoined.startsWith('/')) pathJoined = pathJoined.replace('/', '');
+      //   await githubApi.createRepoFile(githubUser.name, 'TIL', pathJoined, this.mdContents);
       // }
       await content.create(user, this.contentId, data);
       this.$toasted.show(`컨텐츠 ${this.title}이 성공적으로 업로드 되었습니다.`);
@@ -187,6 +194,8 @@ export default {
     eventbus.emit(eventbus.Events.spinner.active);
     try {
       const ret = await content.get(this.contentId);
+      console.log(ret);
+      if (_.isEmpty(ret.keyword)) ret.keyword = [];
       this.title = ret.title;
       this.subTitle = ret.subTitle;
       this.selectedColor = ret.color;
@@ -236,6 +245,7 @@ input
           top: 50px
           left: 45%
           .color
+            box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5)
             cursor: pointer
             margin: 0px 6px
             display: inline-block
@@ -243,22 +253,28 @@ input
             width: 10px
             height: 10px
             border-radius: 50%
-            background: red
             transition: transform .1s
             &.bgGray
               background: #888888
+              color: white
             &.bgYellow
               background: #e7b62f
+              color: brown
             &.bgPink
               background: #ff908e
+              color: skyblue
             &.bgBlue
               background: #215dbe
+              color: rosybrown
             &.bgGreen
               background: #009738
+              color: deepPink
             &.bgPurple
               background: #863c97
+              color: white
             &.bgSky
               background: #6ea8a8
+              color: white
             &:hover
               transform: scale(2)
         .title_txt
@@ -345,6 +361,9 @@ input
           margin: 12px 0 8px
           box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.35)
           transition: background .3s
+          &.fab
+            color: #aaa
+            font-size: 20px
           &:hover
             background: $md-grey-200
           &.background-color-red
