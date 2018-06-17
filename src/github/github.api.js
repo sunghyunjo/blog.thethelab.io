@@ -24,8 +24,14 @@ export default {
     const ret = await client.get(`/repos/${user}/${repo}/contents/`);
     return ret;
   },
+  async getFolderContents(user, repo, path) {
+    const ret = await client.get(`/repos/${user}/${repo}/contents/${path}`);
+    return ret;
+  },
   async getContent(user, repo, path) {
-    const ret = await client.get(`/repos/${user}/${repo}/contents/${path}.md`);
+    if (path.endsWith('.md')) ;
+    const filePath = path.substring(0, path.length - 3);
+    const ret = await client.get(`/repos/${user}/${repo}/contents/${filePath}.md`);
     return ret;
   },
   async deleteRepoFile(user, repo, path, sha) {

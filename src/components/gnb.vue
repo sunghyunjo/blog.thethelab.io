@@ -174,9 +174,9 @@ export default {
       const mds = [];
 
       async function getFolderContent(folder) {
-        const folderContent = await githubApi.getContent(githubUser.login, 'TIL', folder.path);
-        if (folder.name.indexOf('rx') !== -1) return;
         eventBus.emit(eventBus.Events.spinner.message, `폴더 <b>${folder.name}</b>를 읽고 있어요.<br>총 <b>${mds.length}개</b>의 md파일을 읽었어요.`);
+        const folderContent = await githubApi.getFolderContents(githubUser.login, 'TIL', folder.path);
+        if (folder.name.indexOf('rx') !== -1) return;
         console.log('load folder ', folder.name, folderContent);
         for (let i = 0; i < folderContent.data.length; i += 1) {
           const d = folderContent.data[i];
@@ -211,10 +211,15 @@ export default {
           color: colors[idx],
         });
       });
-      await Promise.all(promises);
-      eventBus.emit(eventBus.Events.spinner.message, `${user.displayName} 님의 글을 로드하고 있어요.`);
-      this.contentList = await content.getUserContent(user.uid);
-      eventBus.emit(eventBus.Events.spinner.disable);
+      try {
+        const promisesResult = await Promise.all(promises);
+        eventBus.emit(eventBus.Events.spinner.message, `${user.displayName} 님의 글을 로드하고 있어요.`);
+        this.contentList = await content.getUserContent(user.uid);
+        eventBus.emit(eventBus.Events.spinner.disable);
+        console.log(promisesResult, 'promise result');
+      } catch (e) {
+        eventBus.emit(eventBus.Events.spinner.disable);
+      }
     },
   },
   created() {

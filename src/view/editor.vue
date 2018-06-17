@@ -268,7 +268,7 @@ input
               color: rosybrown
             &.bgGreen
               background: #009738
-              color: deepPink
+              color: white
             &.bgPurple
               background: #863c97
               color: white

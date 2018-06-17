@@ -261,7 +261,7 @@ export default {
 
 .bgGreen
   background: #009738
-  color: deepPink
+  color: white
 
 .bgPurple
   background: #863c97
