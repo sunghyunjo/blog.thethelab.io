@@ -136,6 +136,7 @@ export default {
     search(evt) {
       if (evt.keyCode === 13) {
         this.$router.push(`/search?q=${this.inputKeyword}`);
+        this.inputKeyword = '';
       }
     },
     requestGithubSign() {

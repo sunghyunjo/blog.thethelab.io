@@ -1,6 +1,7 @@
 <template lang="pug">
   .searchWrapper
     .postListSection
+      h3.msg {{queries}}로 검색한 결과
       template(v-for="content in contentList")
         post-list(:title="content.title", :subTitle="content.subTitle",
         :userId="content.userId", :contentId="content.contentId" )
