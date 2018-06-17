@@ -142,6 +142,7 @@ export default {
       } catch (e) {
         console.error(e);
       }
+      eventbus.emit(eventbus.Events.gnb.update);
       eventbus.emit(eventbus.Events.spinner.disable);
     },
     changeTagSelectMode(tag) {
@@ -149,7 +150,7 @@ export default {
       this.$store.commit('setTag', this.tags);
     },
     downloadFile() {
-      var element = document.createElement('a');
+      const element = document.createElement('a');
       element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(this.mdContents)}`);
       element.setAttribute('download', `${this.title}.md`);
 
@@ -158,7 +159,7 @@ export default {
 
       element.click();
 
-      document.body.removeChild(element)
+      document.body.removeChild(element);
     },
     getSelectedTags() {
       return _.filter(this.tags, tag => tag.selected);
@@ -188,6 +189,7 @@ export default {
       await content.create(user, this.contentId, data);
       this.$toasted.show(`컨텐츠 ${this.title}이 성공적으로 업로드 되었습니다.`);
       this.$router.push({ path: `/content/${this.contentId}` });
+      eventbus.emit(eventbus.Events.gnb.update);
     });
   },
   async mounted() {

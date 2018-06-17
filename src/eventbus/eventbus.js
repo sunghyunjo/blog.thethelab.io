@@ -20,6 +20,7 @@ const Events = {
   },
   gnb: {
     scroll: 'gnb.scroll',
+    update: 'gnb.update',
   },
 };
 

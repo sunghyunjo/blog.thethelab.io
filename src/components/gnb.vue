@@ -42,13 +42,13 @@
           .signed-group
             .section-name - 작성글 목록 -
             .listWrapper
-              template(v-for="list in contentList")
-                .list(v-on:click="changePage('/content/' + list.contentId)") {{list.title}}
+              template(v-for="(list, index) in getContentsList")
+                .list(v-on:click="changePage('/content/' + list.contentId)") {{index+1}}. {{list.title}}
 </template>
 
 <script>
 /* eslint-disable no-await-in-loop */
-
+import Vue from 'vue';
 import * as _ from 'lodash';
 import uuid from 'uuid/v1';
 import { auth, content } from '../firebase/firebase.api';
@@ -79,6 +79,9 @@ export default {
     };
   },
   computed: {
+    getContentsList() {
+      return this.contentList;
+    },
     getScroll() {
       if (this.scrollY > 50) return 'scrolled';
       return '';
@@ -233,6 +236,9 @@ export default {
     eventBus.setListener(eventBus.Events.gnb.scroll, (scrollY) => {
       this.scrollY = scrollY;
     });
+    eventBus.setListener(eventBus.Events.gnb.update, async () => {
+      this.contentList = await content.getUserContent(this.$store.getters.getUser.uid);
+    });
   },
   mounted() {
     eventBus.emit(eventBus.Events.spinner.active);
@@ -284,7 +290,7 @@ export default {
   line-height: 50px
   &.scrolled
     .gnb
-      background: rgba(255, 255, 255, 1)
+      background: rgba(255, 255, 255, 0.93)
       border-bottom: solid 1px #eee
       .gnb-command
         color: black !important
