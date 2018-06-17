@@ -89,6 +89,7 @@ export default {
     eventbus.emit(eventbus.Events.spinner.active);
     try {
       await this.updateScreen();
+      console.log(this.color);
     } catch (e) {
       console.error(e);
     }
@@ -130,6 +131,7 @@ export default {
     .title_bg
       width: 100%
       height: inherit
+      color: #ffffff
       .title_txtWrapper
         width: 700px
         height: auto
@@ -210,6 +212,7 @@ export default {
               text-decoration: underline
           .grade
             font-size: 10px
+            padding-top: 3px
             display: inline-block
             vertical-align: top
             padding-left: 5px
@@ -245,31 +248,37 @@ export default {
 
 .bgGray
   background: #888888
-  color: white
+  .title_txt
+    .tags
+      color: #bebebe
 
 .bgYellow
   background: #e7b62f
-  color: brown
+  .title_txt
+    .tags
+      color: #632d00
 
 .bgPink
   background: #ff908e
-  color: skyblue
+  .title_txt
+    .tags
+      color: #008cc2
 
 .bgBlue
   background: #215dbe
-  color: rosybrown
+  .title_txt
+    .tags
+      color: rosybrown
 
 .bgGreen
   background: #009738
-  color: white
 
 .bgPurple
   background: #863c97
-  color: white
 
 .bgSky
   background: #6ea8a8
-  color: white
+
 </style>
 <style lang="sass">
 .content
