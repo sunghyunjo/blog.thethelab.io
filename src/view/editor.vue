@@ -11,7 +11,7 @@
             input.subTitle(placeholder="소제목을 입력하세요", v-model="subTitle")
             input.subTitle(v-model="keywordModel", placeholder="키워드", v-on:keyup.13="keywordSubmit", v-on:keyup.32="keywordSubmit")
             .tags
-              template(v-for="keyword in keywords")
+              template(v-for="(work, keyword) in keywords")
                 .tag(v-bind:class="selectedColor")
                   .text {{ '#' + keyword }}
                     .remove-btn(v-on:click="removeKeyword(keyword)")
@@ -254,27 +254,6 @@ input
             height: 10px
             border-radius: 50%
             transition: transform .1s
-            &.bgGray
-              background: #888888
-              color: white
-            &.bgYellow
-              background: #e7b62f
-              color: brown
-            &.bgPink
-              background: #ff908e
-              color: skyblue
-            &.bgBlue
-              background: #215dbe
-              color: rosybrown
-            &.bgGreen
-              background: #009738
-              color: white
-            &.bgPurple
-              background: #863c97
-              color: white
-            &.bgSky
-              background: #6ea8a8
-              color: white
             &:hover
               transform: scale(2)
         .title_txt

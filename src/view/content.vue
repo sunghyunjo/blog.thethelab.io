@@ -246,39 +246,6 @@ export default {
       tab-size: 2
       padding-bottom: 64px
 
-.bgGray
-  background: #888888
-  .title_txt
-    .tags
-      color: #bebebe
-
-.bgYellow
-  background: #e7b62f
-  .title_txt
-    .tags
-      color: #632d00
-
-.bgPink
-  background: #ff908e
-  .title_txt
-    .tags
-      color: #008cc2
-
-.bgBlue
-  background: #215dbe
-  .title_txt
-    .tags
-      color: rosybrown
-
-.bgGreen
-  background: #009738
-
-.bgPurple
-  background: #863c97
-
-.bgSky
-  background: #6ea8a8
-
 </style>
 <style lang="sass">
 .content
@@ -291,5 +258,6 @@ img
   height: auto
 
 .hljs
-  white-space: nowrap
+  white-space: pre-wrap
+  /*overflow-x: hidden*/
 </style>
