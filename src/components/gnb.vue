@@ -7,7 +7,7 @@
       .gnb-command(v-bind:class="hideBtn", v-on:click="upload") UPLOAD
       .input-group(v-bind:class="changeSearchBarMode")
         i.material-icons search
-        input(placeholder="search")
+        input(placeholder="search", v-model="inputKeyword", v-on:keyup="search")
     .side-nav(v-bind:class="{ visible : isClicked}")
       .side-nav-cover
         i.material-icons.closeBtn(v-on:click="onSideMenu") close
@@ -75,6 +75,7 @@ export default {
       },
       contentList: [],
       scrollY: 0,
+      inputKeyword: '',
     };
   },
   computed: {
@@ -132,6 +133,11 @@ export default {
     },
   },
   methods: {
+    search(evt) {
+      if (evt.keyCode === 13) {
+        this.$router.push(`/search?q=${this.inputKeyword}`);
+      }
+    },
     requestGithubSign() {
       this.$router.push('/auth/github/sign');
     },
@@ -229,6 +235,7 @@ export default {
   },
   mounted() {
     eventBus.emit(eventBus.Events.spinner.active);
+    this.inputKeyword = '';
     auth.addStateChangeListener('gnb', async (user) => {
       console.log('gnb', user, 'is empty : ', _.isEmpty(user));
       if (_.isNil(user) || _.isEmpty(user)) {

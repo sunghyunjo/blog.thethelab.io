@@ -22,15 +22,27 @@ export default {
     return {
       contentList: [],
       isEmpty: false,
+      queries: '',
     };
+  },
+  methods: {
+    async doSearch() {
+      this.isEmpty = false;
+      this.queries = _.filter(_.split(this.$route.query.q, ','), q => !_.isEmpty(q));
+      this.contentList = await content.find(this.queries);
+      if (_.isEmpty(this.contentList)) {
+        this.isEmpty = true;
+      }
+    },
+  },
+  watch: {
+    '$route.query.q': _.debounce(function () {
+      this.doSearch();
+    }),
   },
   async mounted() {
     eventbus.emit(eventbus.Events.spinner.active);
-    const queries = _.filter(_.split(this.$route.query.q, ','), q => !_.isEmpty(q));
-    this.contentList = await content.find(queries);
-    if (_.isEmpty(this.contentList)) {
-      this.isEmpty = true;
-    }
+    this.doSearch();
     eventbus.emit(eventbus.Events.spinner.disable);
   },
 };
