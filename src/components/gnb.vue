@@ -239,6 +239,29 @@ export default {
     eventBus.setListener(eventBus.Events.gnb.update, async () => {
       this.contentList = await content.getUserContent(this.$store.getters.getUser.uid);
     });
+    eventBus.setListener(eventBus.Events.user.updateGrade, async () => {
+      const contentsNum = (await content.getUserContent(this.$store.getters.getUser.uid)).length;
+
+      let grade;
+
+      if (contentsNum > 0 && contentsNum <= 5) {
+        grade = '무지랭이';
+      } else if (contentsNum > 5 && contentsNum <= 15) {
+        grade = '바보';
+      } else if (contentsNum > 15 && contentsNum <= 30) {
+        grade = '햇병아리';
+      } else if (contentsNum > 30 && contentsNum <= 60) {
+        grade = '달팽이';
+      } else if (contentsNum > 60) {
+        grade = '사람';
+      }
+
+      const data = {
+        grade,
+      };
+
+      await auth.update(this.$store.getters.getUser, data);
+    });
   },
   mounted() {
     eventBus.emit(eventBus.Events.spinner.active);

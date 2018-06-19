@@ -22,6 +22,9 @@ const Events = {
     scroll: 'gnb.scroll',
     update: 'gnb.update',
   },
+  user: {
+    updateGrade: 'user.updateGrade',
+  },
 };
 
 export default {

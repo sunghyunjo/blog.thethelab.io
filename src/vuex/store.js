@@ -28,7 +28,6 @@ const store = new Vuex.Store({
   getters: {
     getCount: state => state.count,
     getUser(state) {
-      console.log('getUser:', state.user);
       return state.user;
     },
     getGithubUser(state) {

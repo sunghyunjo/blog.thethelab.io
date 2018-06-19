@@ -143,6 +143,7 @@ export default {
         console.error(e);
       }
       eventbus.emit(eventbus.Events.gnb.update);
+      eventbus.emit(eventbus.Events.user.updateGrade);
       eventbus.emit(eventbus.Events.spinner.disable);
     },
     changeTagSelectMode(tag) {
@@ -190,6 +191,7 @@ export default {
       this.$toasted.show(`컨텐츠 ${this.title}이 성공적으로 업로드 되었습니다.`);
       this.$router.push({ path: `/content/${this.contentId}` });
       eventbus.emit(eventbus.Events.gnb.update);
+      eventbus.emit(eventbus.Events.user.updateGrade);
     });
   },
   async mounted() {
